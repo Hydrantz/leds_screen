@@ -57,7 +57,7 @@ def initiate_rainbow(num):
             pixels[led] = (0,0,0)
             time.sleep(1 / 100)
             pixels.show()
-	i+=1
+    i+=1
 
 def flicker():
     while True:

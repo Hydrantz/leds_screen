@@ -51,11 +51,9 @@ def initiate_rainbow(num):
     while i<num :
         for led in range(LED_NUM):
             pixels[led] = get_rainbow_hue(led, LED_NUM)
-            time.sleep(1 / 100000)
             pixels.show()
         for led in range(LED_NUM):
             pixels[led] = (0,0,0)
-            time.sleep(1 / 100000)
             pixels.show()
         i+=1
 

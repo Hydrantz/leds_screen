@@ -51,13 +51,13 @@ def initiate_rainbow(num):
     while i<num :
         for led in range(LED_NUM):
             pixels[led] = get_rainbow_hue(led, LED_NUM)
-            time.sleep(1 / 100)
+            time.sleep(1 / 500)
             pixels.show()
         for led in range(LED_NUM):
             pixels[led] = (0,0,0)
-            time.sleep(1 / 100)
+            time.sleep(1 / 500)
             pixels.show()
-    i+=1
+        i+=1
 
 def flicker():
     while True:
@@ -70,4 +70,4 @@ def flicker():
 
 
 initiate_rainbow(5)
-pixels.fill((254, 254, 254))
+pixels.fill((51, 204, 51))

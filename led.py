@@ -4,7 +4,7 @@ import neopixel
 import math
 import random
 
-LED_NUM = 300
+LED_NUM = 220
 GPIO = board.D18
 ORDER = neopixel.GRB
 

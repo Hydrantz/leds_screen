@@ -31,7 +31,7 @@ pixels = neopixel.NeoPixel(GPIO, LED_NUM, pixel_order=ORDER, auto_write=False)
 
 def get_rainbow_hue(part, whole):
     points = int(1530/whole*part)
-    colors = {"r": 255, "g": 0, "b": 255}
+    colors = {"r": 255, "g": 255, "b": 0}
     cur = "b"
     while points > 255:
         colors[cur] = abs(colors[cur]-255)
@@ -51,11 +51,11 @@ def initiate_rainbow(num):
     while i<num :
         for led in range(LED_NUM):
             pixels[led] = get_rainbow_hue(led, LED_NUM)
-            time.sleep(1 / 10000)
+            time.sleep(1 / 100)
             pixels.show()
         for led in range(LED_NUM):
             pixels[led] = (0,0,0)
-            time.sleep(1 / 10000)
+            time.sleep(1 / 100)
             pixels.show()
         i+=1
 

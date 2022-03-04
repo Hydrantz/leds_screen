@@ -5,7 +5,7 @@ import math
 import random
 
 LED_NUM = 600
-GPIO = board.D18
+GPIO = board.D12
 ORDER = neopixel.GRB
 
 
@@ -31,40 +31,44 @@ pixels = neopixel.NeoPixel(GPIO, LED_NUM, pixel_order=ORDER, auto_write=False)
 
 def get_rainbow_hue(part, whole):
     points = int(1530/whole*part)
-    colors = {"r": 255, "g": 255, "b": 0}
+    colors = {"r": 255, "g": 255, "b": 255}
     cur = "b"
     while points > 255:
         colors[cur] = abs(colors[cur]-255)
         points-=255
         if cur == "b":
-            cur == "g"
+            cur = "g"
         elif cur == "g":
-            cur == "r"
+            cur = "r"
         elif cur == "r":
-            cur == "b"
+            cur = "b"
     colors[cur] = abs(colors[cur] - points)
     return colors["r"], colors["g"], colors["b"]
 
 
-def initiate_rainbow(num):
-    i = 0
-    while i<num :
+def initiate_rainbow():
+    times = []
+    for i in range(5):
         for led in range(LED_NUM):
-            pixels[led] = get_rainbow_hue(led, LED_NUM)
+            temp = get_rainbow_hue(led, LED_NUM)
+            start = time.time()
+            pixels[led] = temp
             pixels.show()
+            end = time.time()
+            times.append(end-start)
+        time.sleep(1 / 100)
         for led in range(LED_NUM):
             pixels[led] = (0,0,0)
             pixels.show()
-        i+=1
+    avg = sum(times)/len(times)
+    print(avg)
 
 def flicker():
     while True:
         pixels.fill((255,255,255))
         pixels.show()
-        time.sleep(5 / 100)
         pixels.fill((0,0,0))
         pixels.show()
-        time.sleep(5 / 100)
 
 
-initiate_rainbow(100)
+initiate_rainbow()

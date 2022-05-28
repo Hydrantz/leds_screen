@@ -29,6 +29,9 @@ def coords2led_index(x, y):
 def draw_pixel(led, r, g, b, w):
     pixels._set_item(led, r, g, b, w)
 
+def draw_pixel_old(led, r, g, b, w):
+    pixels._post_brightness_buffer[led*3:3*(led+1)] = r, g, b
+
 def write_grid2board(grid: list):
     global pixels
     width = len(grid)
@@ -48,3 +51,10 @@ def write_grid2board(grid: list):
 def clear_screen():
     pixels.fill((0,0,0))
     # pixels.show()
+
+
+time1 = time()
+draw_pixel(599, 255,0,255,0)
+time2 = time()
+pixels.show()
+print(time2-time1)

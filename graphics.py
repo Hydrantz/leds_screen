@@ -2,21 +2,18 @@ from time import sleep, time
 import board
 import neopixel
 
+HEIGHT = 20
+WIDTH = 30
 LED_NUM = 600
+
 GPIO = board.D12
 ORDER = neopixel.GRB
 
 pixels = neopixel.NeoPixel(GPIO, LED_NUM, pixel_order=ORDER, auto_write=False)
 
-HEIGHT = 20
-WIDTH = 30
-
 WHITE = pixels._parse_color((150,150,150))
 BLUE = pixels._parse_color((0,0,255))
 EMPTY = pixels._parse_color((0,0,0))
-
-
-# pixels = [EMPTY]*LED_NUM
 
 def coords2led_index(x, y):
     index = (x-1)*HEIGHT
@@ -51,10 +48,3 @@ def write_grid2board(grid: list):
 def clear_screen():
     pixels.fill((0,0,0))
     # pixels.show()
-
-
-time1 = time()
-draw_pixel(599, 255,0,255,0)
-time2 = time()
-pixels.show()
-print(time2-time1)

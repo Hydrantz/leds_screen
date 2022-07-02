@@ -13,6 +13,8 @@ pixels = neopixel.NeoPixel(GPIO, LED_NUM, pixel_order=ORDER, auto_write=False)
 
 WHITE = pixels._parse_color((150,150,150))
 BLUE = pixels._parse_color((0,0,255))
+RED = pixels._parse_color((255,0,0))
+GREEN = pixels._parse_color((0,255,0))
 EMPTY = pixels._parse_color((0,0,0))
 
 def coords2led_index(x, y):

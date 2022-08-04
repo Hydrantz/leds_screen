@@ -60,7 +60,7 @@ class Snake():
             self.snake_offsets.append((x_offset, y_offset))
 
 
-def proccess_input(snake: Snake, new_speed):
+def process_input(snake: Snake, new_speed):
     prev_speed = new_speed
     if keyboard.is_pressed("up"):
         new_speed = (-1, 0)
@@ -106,23 +106,26 @@ def manage_apples(isApple, appleCoords, snake: Snake):
         graphics.draw_pixel(graphics.coords2led_index(*appleCoords), *graphics.GREEN)
     return (isApple, appleCoords)
 
-
-def play():
-    isApple = False
-    appleCoords = None
+def color_frame():
     for i in range(graphics.WIDTH):
         graphics.draw_pixel(graphics.coords2led_index(i+1, 0), *graphics.BLUE)
         graphics.draw_pixel(graphics.coords2led_index(i+1, graphics.HEIGHT), *graphics.BLUE)
     for i in range(graphics.HEIGHT):
         graphics.draw_pixel(graphics.coords2led_index(1, i+1), *graphics.BLUE)
         graphics.draw_pixel(graphics.coords2led_index(graphics.WIDTH, i+1), *graphics.BLUE)
+
+
+def play():
+    isApple = False
+    appleCoords = None
+    color_frame()
     snake = Snake()
     run = True
     new_speed = (0, 1)
     keyboard.wait("left")
 
     while run:
-        new_speed = proccess_input(snake, new_speed)
+        new_speed = process_input(snake, new_speed)
         isApple, appleCoords = manage_apples(isApple, appleCoords, snake)
 
         run = snake.move_snake()
@@ -133,3 +136,4 @@ while True:
     play()
     sleep(2)
     graphics.clear_screen()
+    color_frame()

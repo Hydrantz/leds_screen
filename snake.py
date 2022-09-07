@@ -1,5 +1,5 @@
-from time import time, sleep
-import keyboard, graphics
+from time import time, sleep, perf_counter
+import keyboard, graphics, controls
 import random
 
 HEIGHT = graphics.HEIGHT
@@ -26,7 +26,7 @@ class Snake():
 
     def draw_snake(self):
         cur_coords = (self.snake_x, self.snake_y)
-        time1 = time()
+        #time1 = perf_counter()
         graphics.draw_pixel(graphics.coords2led_index(*cur_coords), *graphics.RED)
         for chain in range(len(self.snake_offsets)-Snake.ABS_SPEED):
             cur_coords = cur_coords[0] + self.snake_offsets[chain][0], cur_coords[1] + self.snake_offsets[chain][1]
@@ -34,8 +34,9 @@ class Snake():
         for i in range(Snake.ABS_SPEED):
             cur_coords = cur_coords[0] + self.snake_offsets[-i-1][0], cur_coords[1] + self.snake_offsets[-i-1][1]
             graphics.draw_pixel(graphics.coords2led_index(*cur_coords), *graphics.EMPTY)
+        time1 = perf_counter()
         graphics.pixels.show()
-        time2 = time()
+        time2 = perf_counter()
         print(1/(time2-time1))
 
     def move_snake(self):
@@ -59,25 +60,40 @@ class Snake():
         for i in range(Snake.ABS_SPEED):
             self.snake_offsets.append((x_offset, y_offset))
 
+def handle_controls_input(prev_speeds):
+    new_speeds = prev_speeds
+    keys = controls.get_controls()
+    if keys[0]:
+        new_speeds = (-1, 0)
+    elif keys[1]:
+        new_speeds = (1, 0)
+    elif keys[2]:
+        new_speeds = (0, 1)
+    elif keys[3]:
+        new_speeds = (0, -1)
+    return new_speeds
 
-def process_input(snake: Snake, new_speed):
-    prev_speed = new_speed
+def handle_keyboard_input(prev_speeds):
+    new_speeds = prev_speeds
     if keyboard.is_pressed("up"):
-        new_speed = (-1, 0)
+        new_speeds = (-1, 0)
     elif keyboard.is_pressed("down"):
-        new_speed = (1, 0)
+        new_speeds = (1, 0)
     elif keyboard.is_pressed("left"):
-        new_speed = (0, 1)
+        new_speeds = (0, 1)
     elif keyboard.is_pressed("right"):
-        new_speed = (0, -1)
+        new_speeds = (0, -1)
+    return new_speeds
 
-    if (snake.snake_speeds[0] != (-1)*new_speed[0] and
-    snake.snake_speeds[1] != (-1)*new_speed[1]) or (
-    snake.snake_speeds == (0, 0)):
-        snake.snake_speeds = new_speed
-        return new_speed
-    else:
-        return prev_speed
+def process_input(snake: Snake, prev_speeds):
+    # new_speeds = handle_keyboard_input(prev_speeds)
+    new_speeds = handle_controls_input(prev_speeds)
+
+    if (prev_speeds != (-1)*new_speeds[0] and
+    prev_speeds != (-1)*new_speeds[1]) or (
+    prev_speeds == (0, 0)):
+        return new_speeds
+    return prev_speeds
 
 def manage_apples(isApple, appleCoords, snake: Snake):
     snakeX = snake.snake_x
@@ -121,15 +137,18 @@ def play():
     color_frame()
     snake = Snake()
     run = True
-    new_speed = (0, 1)
-    keyboard.wait("left")
+    initial_speed = (0, 1)
+    # keyboard.wait("left")
+    controls.wait_for("left")
 
+    process_input(snake, initial_speed)
     while run:
-        new_speed = process_input(snake, new_speed)
+        speeds = process_input(snake, snake.snake_speeds)
+        snake.snake_speeds = speeds
         isApple, appleCoords = manage_apples(isApple, appleCoords, snake)
 
         run = snake.move_snake()
-        sleep(0.02)
+        # sleep(0.02)
     snake = None
 
 while True:

@@ -2,7 +2,7 @@ import board
 import neopixel
 
 LED_NUM = 600
-GPIO = board.D12
+GPIO = board.D21
 ORDER = neopixel.GRB
 
 

@@ -1,6 +1,6 @@
 from time import time, sleep, perf_counter
 import keyboard, graphics, controls
-import random
+import random, sys
 
 HEIGHT = graphics.HEIGHT
 WIDTH = graphics.WIDTH
@@ -35,7 +35,7 @@ class Snake():
             cur_coords = cur_coords[0] + self.snake_offsets[-i-1][0], cur_coords[1] + self.snake_offsets[-i-1][1]
             graphics.draw_pixel(graphics.coords2led_index(*cur_coords), *graphics.EMPTY)
         time1 = perf_counter()
-        graphics.pixels.show()
+        graphics.update_screen()
         time2 = perf_counter()
         print(1/(time2-time1))
 
@@ -60,34 +60,34 @@ class Snake():
         for i in range(Snake.ABS_SPEED):
             self.snake_offsets.append((x_offset, y_offset))
 
-def handle_controls_input(prev_speeds):
-    new_speeds = prev_speeds
-    keys = controls.get_controls()
-    if keys[0]:
-        new_speeds = (-1, 0)
-    elif keys[1]:
-        new_speeds = (1, 0)
-    elif keys[2]:
-        new_speeds = (0, 1)
-    elif keys[3]:
-        new_speeds = (0, -1)
-    return new_speeds
-
-def handle_keyboard_input(prev_speeds):
-    new_speeds = prev_speeds
-    if keyboard.is_pressed("up"):
-        new_speeds = (-1, 0)
-    elif keyboard.is_pressed("down"):
-        new_speeds = (1, 0)
-    elif keyboard.is_pressed("left"):
-        new_speeds = (0, 1)
-    elif keyboard.is_pressed("right"):
-        new_speeds = (0, -1)
-    return new_speeds
+if sys.argv[1] == "keyboard":
+    def handle_input(prev_speeds):
+        new_speeds = prev_speeds
+        if keyboard.is_pressed("up"):
+            new_speeds = (-1, 0)
+        elif keyboard.is_pressed("down"):
+            new_speeds = (1, 0)
+        elif keyboard.is_pressed("left"):
+            new_speeds = (0, 1)
+        elif keyboard.is_pressed("right"):
+            new_speeds = (0, -1)
+        return new_speeds
+else:
+    def handle_input(prev_speeds):
+        new_speeds = prev_speeds
+        keys = controls.get_controls()
+        if keys[0]:
+            new_speeds = (-1, 0)
+        elif keys[1]:
+            new_speeds = (1, 0)
+        elif keys[2]:
+            new_speeds = (0, 1)
+        elif keys[3]:
+            new_speeds = (0, -1)
+        return new_speeds
 
 def process_input(snake: Snake, prev_speeds):
-    # new_speeds = handle_keyboard_input(prev_speeds)
-    new_speeds = handle_controls_input(prev_speeds)
+    new_speeds = handle_input(prev_speeds)
 
     if (prev_speeds != (-1)*new_speeds[0] and
     prev_speeds != (-1)*new_speeds[1]) or (
@@ -138,8 +138,10 @@ def play():
     snake = Snake()
     run = True
     initial_speed = (0, 1)
-    # keyboard.wait("left")
-    controls.wait_for("left")
+    if sys.argv[1] == "keyboard":
+        keyboard.wait("left")
+    else:
+        controls.wait_for("left")
 
     process_input(snake, initial_speed)
     while run:

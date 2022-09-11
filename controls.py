@@ -1,3 +1,4 @@
+from time import sleep
 from turtle import right
 import board
 import digitalio

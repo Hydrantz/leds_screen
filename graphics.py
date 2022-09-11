@@ -22,7 +22,7 @@ ORDER = neopixel.GRB
 """order of colors"""
 
 # physical properties of the Raspberry Pi:
-GPIO = board.D12
+GPIO = board.D21
 """id of Raspberry Pi GPIO pin (PWM) the screen is connected to"""
 
 # creates screen object using neopixel library

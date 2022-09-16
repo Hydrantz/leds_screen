@@ -3,7 +3,11 @@ import board
 import neopixel
 import sys
 
-if sys.argv[0] == "controls":
+mode = None
+if len(sys.argv)>1:
+    mode = sys.argv[1]
+
+if mode == "controls":
     LED_NUM = 56
 else:
     LED_NUM = 600
@@ -31,7 +35,7 @@ def get_rainbow_hue(part, whole):
 
 
 def initiate_rainbow():
-    for i in range(5):
+    for i in range(25):
         time1 = time.time()
         for led in range(LED_NUM):
             temp = get_rainbow_hue(led, LED_NUM)

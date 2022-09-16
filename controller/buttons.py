@@ -1,7 +1,13 @@
-from time import sleep
-from turtle import right
+"""
+Controller Module
+----
+- Manages a custom-made controller
+---
+"""
+
 import board
 import digitalio
+
 
 UP = digitalio.DigitalInOut(board.D1)
 UP.direction = digitalio.Direction.INPUT
@@ -21,7 +27,8 @@ RIGHT.pull = digitalio.Pull.DOWN
 
 def wait_for(key):
     while True:
-        if get_key_status(key):
+        status = get_key_status(key)
+        if status:
             return
 
 def get_key_status(key: str):

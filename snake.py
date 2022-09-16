@@ -1,9 +1,14 @@
 from time import time, sleep, perf_counter
-import keyboard, graphics, controls
-import random, sys
+import graphics, controller.buttons, controller.lighting
+import random, keyboard, sys
 
 HEIGHT = graphics.HEIGHT
 WIDTH = graphics.WIDTH
+
+control_mode = None
+if len(sys.argv) > 1:
+    control_mode = sys.argv[1]
+print(control_mode)
 
 EMPTY_BOARD = [[graphics.EMPTY for y in range(HEIGHT)] for x in range(WIDTH)]
 
@@ -60,7 +65,7 @@ class Snake():
         for i in range(Snake.ABS_SPEED):
             self.snake_offsets.append((x_offset, y_offset))
 
-if sys.argv[1] == "keyboard":
+if control_mode == "keyboard":
     def handle_input(prev_speeds):
         new_speeds = prev_speeds
         if keyboard.is_pressed("up"):
@@ -75,14 +80,18 @@ if sys.argv[1] == "keyboard":
 else:
     def handle_input(prev_speeds):
         new_speeds = prev_speeds
-        keys = controls.get_controls()
+        keys = controller.buttons.get_controls()
         if keys[0]:
+            controller.lighting.direction("u")
             new_speeds = (-1, 0)
         elif keys[1]:
+            controller.lighting.direction("d")
             new_speeds = (1, 0)
         elif keys[2]:
+            controller.lighting.direction("l")
             new_speeds = (0, 1)
         elif keys[3]:
+            controller.lighting.direction("r")
             new_speeds = (0, -1)
         return new_speeds
 
@@ -137,11 +146,11 @@ def play():
     color_frame()
     snake = Snake()
     run = True
-    initial_speed = (0, 1)
-    if sys.argv[1] == "keyboard":
+    initial_speed = (0, 0)
+    if control_mode == "keyboard":
         keyboard.wait("left")
     else:
-        controls.wait_for("left")
+        controller.buttons.wait_for("left")
 
     process_input(snake, initial_speed)
     while run:
@@ -153,6 +162,8 @@ def play():
         # sleep(0.02)
     snake = None
 
+sleep(2)
+controller.lighting.cyc()
 while True:
     play()
     sleep(2)

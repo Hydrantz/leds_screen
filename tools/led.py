@@ -1,7 +1,8 @@
 import time
-import board
 import neopixel
 import sys
+
+from leds_screen.screen import screen_configuration as screen_conf
 
 mode = None
 if len(sys.argv)>1:
@@ -10,10 +11,9 @@ if len(sys.argv)>1:
 if mode == "controls":
     LED_NUM = 56
 else:
-    LED_NUM = 600
-GPIO = board.D21
-ORDER = neopixel.GRB
-
+    LED_NUM = screen_conf.LED_NUM
+GPIO = screen_conf.GPIO
+ORDER = screen_conf.ORDER
 
 pixels = neopixel.NeoPixel(GPIO, LED_NUM, pixel_order=ORDER, auto_write=False)
 
@@ -33,7 +33,6 @@ def get_rainbow_hue(part, whole):
     colors[cur] = abs(colors[cur] - points)
     return colors["r"], colors["g"], colors["b"]
 
-
 def initiate_rainbow():
     for i in range(25):
         time1 = time.time()
@@ -47,8 +46,6 @@ def initiate_rainbow():
         for led in range(LED_NUM):
             pixels[led] = (0,0,0)
             pixels.show()
-    avg = sum(times)/len(times)
-    print(avg)
 
 def flicker():
     while True:
@@ -56,6 +53,5 @@ def flicker():
         pixels.show()
         pixels.fill((0,0,0))
         pixels.show()
-
 
 initiate_rainbow()

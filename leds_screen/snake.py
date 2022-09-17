@@ -1,14 +1,16 @@
-from time import time, sleep, perf_counter
-import graphics, controller.buttons, controller.lighting
-import random, keyboard, sys
+from time import sleep, perf_counter
+import random, sys
+from leds_screen.screen import graphics, screen_configuration as screen_conf
+from leds_screen.controller import buttons, lighting as controller_lights
 
-HEIGHT = graphics.HEIGHT
-WIDTH = graphics.WIDTH
+HEIGHT = screen_conf.HEIGHT
+WIDTH = screen_conf.WIDTH
 
 control_mode = None
 if len(sys.argv) > 1:
-    control_mode = sys.argv[1]
-print(control_mode)
+    CONTROL_MODE = sys.argv[1]
+if control_mode == "keyboard":
+    import keyboard
 
 EMPTY_BOARD = [[graphics.EMPTY for y in range(HEIGHT)] for x in range(WIDTH)]
 
@@ -42,7 +44,6 @@ class Snake():
         time1 = perf_counter()
         graphics.update_screen()
         time2 = perf_counter()
-        print(1/(time2-time1))
 
     def move_snake(self):
         self.snake_x += Snake.ABS_SPEED*self.snake_speeds[0]
@@ -157,7 +158,7 @@ def play():
     if control_mode == "keyboard":
         keyboard.wait("left")
     else:
-        controller.buttons.wait_for("left")
+        buttons.wait_for("left")
 
     process_input(snake, initial_speed)
     while run:
@@ -169,8 +170,9 @@ def play():
         # sleep(0.02)
     snake = None
 
+print(CONTROL_MODE)
 sleep(2)
-controller.lighting.cyc()
+controller_lights.cyc()
 while True:
     play()
     sleep(2)

@@ -12,8 +12,6 @@ int bun_led_amount = 6;
 
 const int numChars = 32;
 char receivedChars[numChars];
-boolean newData = false;
-
 
 String data = "";
 String first = "";
@@ -22,7 +20,7 @@ String last = "";
 String prev_bun = "";
   
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(230400);
   Serial.setTimeout(100);
   #if defined (__AVR_ATtiny85__)
   if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
@@ -34,34 +32,8 @@ void setup() {
   pixels.show();
 }
 
-void recvWithEndMarker() {
-    static int ndx = 0;
-    char endMarker = '\n';
-    char rc;
-    newData = false;
-    while (newData == false) {
-      if (Serial.available()) {
-        rc = Serial.read();
-        if (rc != endMarker) {
-            receivedChars[ndx] = rc;
-            ndx++;
-            if (ndx >= numChars) {
-                ndx = numChars - 1;
-            }
-        }
-        else {
-            receivedChars[ndx] = '\0'; // terminate the string
-            ndx = 0;
-            newData = true;
-        }
-      }
-    }
-}
-
 bool get_input() {
     if (Serial.available() > 0) {
-//      recvWithEndMarker();
-//      data = String(receivedChars);
       data = Serial.readStringUntil('\n');
       int ind = data.indexOf('|');
       String new_first = data.substring(0, ind);
@@ -97,6 +69,7 @@ void manage_buns(String direction) {
            direction != "d" &&
            direction != "l" &&
            direction != "r") {
+            Serial.write(1);
             return;
            }
   else {
@@ -200,11 +173,11 @@ void blue() {
   while (true){
     setAll(0,0,0);
     for(int i=bun_led_amount;i<NUMPIXELS;i++){
-      if (get_input()) { return; }
       // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
       pixels.setPixelColor(i, pixels.Color(0,0,255)); // Moderately bright green color.
       pixels.show(); // This sends the updated pixel color to the hardware.
       delay(10); // Delay for a period of time (in milliseconds).
+      if (get_input()) { return; }
     }
   }
 }

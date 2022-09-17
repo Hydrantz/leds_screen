@@ -1,7 +1,7 @@
 """
 Controller Module
 ----
-- Manages a custom-made controller
+- Manages buttons of custom-made controller
 ---
 """
 

@@ -1,32 +1,18 @@
 """
 Graphics Module
 ----
-- controls a rectangular array of `WS2812B` LEDs using Raspberry Pi.
+- controls a rectangular array of `WS2812B` LEDs using a Raspberry Pi.
 - screen will not be refreshed with new values until update_screen() is called.
 ---
-WS2812B datasheet:
-- https://blog.hydrantz.com/wp-stuff/wp-content/uploads/2022/04/WS2812B.pdf
+[WS2812B datasheet](https://blog.hydrantz.com/wp-stuff/wp-content/uploads/2022/04/WS2812B.pdf)
 """
 
 import board
 import neopixel
-
-# physical properties of the screen:
-WIDTH = 30
-"""number of LED columns"""
-HEIGHT = 20 
-"""number of LEDs in each column"""
-LED_NUM = WIDTH * HEIGHT
-"""overall number of LEDs"""
-ORDER = neopixel.GRB
-"""order of colors"""
-
-# physical properties of the Raspberry Pi:
-GPIO = board.D21
-"""id of Raspberry Pi GPIO pin (PWM) the screen is connected to"""
+import screen_configuration as screen_conf
 
 # creates screen object using neopixel library
-pixels = neopixel.NeoPixel(GPIO, LED_NUM, pixel_order=ORDER, auto_write=False)
+pixels = neopixel.NeoPixel(screen_conf.GPIO, screen_conf.LED_NUM, pixel_order=screen_conf.LED_NUM, auto_write=False)
 
 # pre-defined colors using RGB values
 WHITE = pixels._parse_color((150,150,150))
@@ -51,16 +37,16 @@ def coords2led_index(x, y):
     Returns:
         int: pixels chain index of given pixel
     """
-    index = (x-1)*HEIGHT
+    index = (x-1)*screen_conf.HEIGHT
     if x % 2 == 1:
         index += y
     else:
-        index += HEIGHT-y-1
+        index += screen_conf.HEIGHT-y-1
     return index
 
 def draw_pixel(led, r, g, b, w):
     """colors a given pixel index with given RGBW values.
-    RGB to RGBW convertion can be done with RGB_parse()
+    RGB to RGBW conversion can be done with RGB_parse()
 
     Args:
         led (int): pixel chain index

@@ -1,7 +1,7 @@
 from time import sleep, perf_counter
 import random, sys
-from leds_screen.screen import graphics, screen_configuration as screen_conf
-from leds_screen.controller import buttons, lighting as controller_lights
+from screen import graphics, screen_configuration as screen_conf
+from controller import buttons, lighting as controller_lights
 
 HEIGHT = screen_conf.HEIGHT
 WIDTH = screen_conf.WIDTH
@@ -140,12 +140,12 @@ def manage_apples(isApple, appleCoords, snake: Snake):
     return (isApple, appleCoords)
 
 def color_frame():
-    for i in range(graphics.WIDTH):
+    for i in range(screen_conf.WIDTH):
         graphics.draw_pixel(graphics.coords2led_index(i+1, 0), *graphics.BLUE)
-        graphics.draw_pixel(graphics.coords2led_index(i+1, graphics.HEIGHT), *graphics.BLUE)
-    for i in range(graphics.HEIGHT):
+        graphics.draw_pixel(graphics.coords2led_index(i+1, screen_conf.HEIGHT), *graphics.BLUE)
+    for i in range(screen_conf.HEIGHT):
         graphics.draw_pixel(graphics.coords2led_index(1, i+1), *graphics.BLUE)
-        graphics.draw_pixel(graphics.coords2led_index(graphics.WIDTH, i+1), *graphics.BLUE)
+        graphics.draw_pixel(graphics.coords2led_index(screen_conf.WIDTH, i+1), *graphics.BLUE)
 
 
 def play():
@@ -170,7 +170,7 @@ def play():
         # sleep(0.02)
     snake = None
 
-print(CONTROL_MODE)
+print(control_mode)
 sleep(2)
 controller_lights.cyc()
 while True:

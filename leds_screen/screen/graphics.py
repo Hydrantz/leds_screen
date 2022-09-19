@@ -7,12 +7,11 @@ Graphics Module
 [WS2812B datasheet](https://blog.hydrantz.com/wp-stuff/wp-content/uploads/2022/04/WS2812B.pdf)
 """
 
-import board
 import neopixel
-import screen_configuration as screen_conf
+from screen import screen_configuration as screen_conf
 
 # creates screen object using neopixel library
-pixels = neopixel.NeoPixel(screen_conf.GPIO, screen_conf.LED_NUM, pixel_order=screen_conf.LED_NUM, auto_write=False)
+pixels = neopixel.NeoPixel(screen_conf.GPIO, screen_conf.LED_NUM, pixel_order=screen_conf.ORDER, auto_write=False)
 
 # pre-defined colors using RGB values
 WHITE = pixels._parse_color((150,150,150))

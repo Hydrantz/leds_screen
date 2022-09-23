@@ -80,7 +80,7 @@ if control_mode == "keyboard":
 else:
     def handle_input(prev_speeds):
         new_speeds = prev_speeds
-        keys = buttons.get_controls()
+        keys = controller.buttons.get_controls()
         if keys[0]:
             new_speeds = (-1, 0)
         elif keys[1]:
@@ -90,7 +90,7 @@ else:
         elif keys[3]:
             new_speeds = (0, -1)
         if new_speeds != prev_speeds:
-            controller_lights.direction(speed_conversion(new_speeds))
+            controller.lighting.direction(speed_conversion(new_speeds))
         return new_speeds
 
 def speed_conversion(speed: tuple):

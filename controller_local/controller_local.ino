@@ -8,7 +8,7 @@
 
 
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
-int bun_led_amount = 6;
+int bun_led_amount = 10;
 
 const int numChars = 32;
 char receivedChars[numChars];
@@ -68,8 +68,8 @@ void manage_buns(String direction) {
   else if (direction != "u" &&
            direction != "d" &&
            direction != "l" &&
-           direction != "r") {
-            Serial.write(1);
+           direction != "r" &&
+           direction != "a") {
             return;
            }
   else {
@@ -77,19 +77,20 @@ void manage_buns(String direction) {
   }
   setBuns(255,255,255);
   if (direction == "u") {
+      setPixel(2,0,0,0);
+      setPixel(3,0,0,0);
+  }
+  else if (direction == "d") {
       setPixel(0,0,0,0);
       setPixel(1,0,0,0);
   }
-  else if (direction == "d") {
-      
-  }
   else if (direction == "l") {
-      setPixel(5,0,0,0);
-      setPixel(4,0,0,0);
+      setPixel(6,0,0,0);
+      setPixel(7,0,0,0);
   }
   else if (direction == "r") {
-      setPixel(2,0,0,0);
-      setPixel(3,0,0,0);
+      setPixel(4,0,0,0);
+      setPixel(5,0,0,0);
   }
   pixels.show();
 }

@@ -5,19 +5,36 @@ Controller Module
 ---
 """
 
-import serial
+CONNECTED = None
 
-ser = serial.Serial(port="/dev/ttyACM0", baudrate=230400 , timeout=.1)
-ser.flush
+try:
+    import serial
+    global ser
+    ser = serial.Serial(port="/dev/ttyACM0", baudrate=230400 , timeout=.1)
+    ser.flush()
+    CONNECTED = True
+except:
+    CONNECTED = False
+    print("running without controller lighting")
+
+def reset_connection():
+    if CONNECTED:
+        ser.flush()
 
 def blue():
-    ser.write(bytes("b", 'utf-8'))
+    if CONNECTED:
+        ser.write(bytes("b", 'utf-8'))
 
 def cyc():
-    ser.write(bytes("c", 'utf-8'))
+    if CONNECTED:
+        ser.write(bytes("c", 'utf-8'))
 
 def direction(value: str):
-    ser.write(bytes("a|"+value, 'utf-8'))
+    if CONNECTED:
+        ser.write(bytes("a|"+value, 'utf-8'))
 
 def white(value: str):
-    ser.write(bytes("w|"+value, 'utf-8'))
+    if CONNECTED:
+        ser.write(bytes("w|"+value, 'utf-8'))
+
+reset_connection()

@@ -1,15 +1,17 @@
-from time import sleep, perf_counter
+from time import sleep
 import random, sys
-from leds_screen.screen import graphics, screen_configuration as screen_conf
-from leds_screen.controller import buttons, lighting as controller_lights
+from os.path import dirname, abspath
+sys.path.append(dirname(dirname(abspath(__file__))))
+from screen import graphics, screen_configuration as screen_conf
+from controller import buttons, lighting as controller_lights
 
 HEIGHT = screen_conf.HEIGHT
 WIDTH = screen_conf.WIDTH
 
-control_mode = None
+CONTROL_MODE = None
 if len(sys.argv) > 1:
     CONTROL_MODE = sys.argv[1]
-if control_mode == "keyboard":
+if CONTROL_MODE == "keyboard":
     import keyboard
 
 EMPTY_BOARD = [[graphics.EMPTY for y in range(HEIGHT)] for x in range(WIDTH)]
@@ -33,17 +35,15 @@ class Snake():
 
     def draw_snake(self):
         cur_coords = (self.snake_x, self.snake_y)
-        #time1 = perf_counter()
-        graphics.draw_pixel(graphics.coords2led_index(*cur_coords), *graphics.RED)
+        coords = cur_coords
         for chain in range(len(self.snake_offsets)-Snake.ABS_SPEED):
-            cur_coords = cur_coords[0] + self.snake_offsets[chain][0], cur_coords[1] + self.snake_offsets[chain][1]
-            graphics.draw_pixel(graphics.coords2led_index(*cur_coords), *graphics.WHITE)
+            coords = coords[0] + self.snake_offsets[chain][0], coords[1] + self.snake_offsets[chain][1]
+            graphics.draw_pixel(graphics.coords2led_index(*coords), *graphics.WHITE)
         for i in range(Snake.ABS_SPEED):
-            cur_coords = cur_coords[0] + self.snake_offsets[-i-1][0], cur_coords[1] + self.snake_offsets[-i-1][1]
-            graphics.draw_pixel(graphics.coords2led_index(*cur_coords), *graphics.EMPTY)
-        time1 = perf_counter()
+            coords = coords[0] + self.snake_offsets[-i-1][0], coords[1] + self.snake_offsets[-i-1][1]
+            graphics.draw_pixel(graphics.coords2led_index(*coords), *graphics.EMPTY)
+        graphics.draw_pixel(graphics.coords2led_index(*cur_coords), *graphics.RED)
         graphics.update_screen()
-        time2 = perf_counter()
 
     def move_snake(self):
         self.snake_x += Snake.ABS_SPEED*self.snake_speeds[0]
@@ -66,7 +66,7 @@ class Snake():
         for i in range(Snake.ABS_SPEED):
             self.snake_offsets.append((x_offset, y_offset))
 
-if control_mode == "keyboard":
+if CONTROL_MODE == "keyboard":
     def handle_input(prev_speeds):
         new_speeds = prev_speeds
         if keyboard.is_pressed("up"):
@@ -140,12 +140,12 @@ def manage_apples(isApple, appleCoords, snake: Snake):
     return (isApple, appleCoords)
 
 def color_frame():
-    for i in range(graphics.WIDTH):
+    for i in range(screen_conf.WIDTH):
         graphics.draw_pixel(graphics.coords2led_index(i+1, 0), *graphics.BLUE)
-        graphics.draw_pixel(graphics.coords2led_index(i+1, graphics.HEIGHT), *graphics.BLUE)
-    for i in range(graphics.HEIGHT):
+        graphics.draw_pixel(graphics.coords2led_index(i+1, screen_conf.HEIGHT), *graphics.BLUE)
+    for i in range(screen_conf.HEIGHT):
         graphics.draw_pixel(graphics.coords2led_index(1, i+1), *graphics.BLUE)
-        graphics.draw_pixel(graphics.coords2led_index(graphics.WIDTH, i+1), *graphics.BLUE)
+        graphics.draw_pixel(graphics.coords2led_index(screen_conf.WIDTH, i+1), *graphics.BLUE)
 
 
 def play():
@@ -155,11 +155,11 @@ def play():
     snake = Snake()
     run = True
     initial_speed = (0, 0)
-    if control_mode == "keyboard":
+    if CONTROL_MODE == "keyboard":
         keyboard.wait("left")
     else:
         buttons.wait_for("left")
-
+    controller_lights.direction("l")
     process_input(snake, initial_speed)
     while run:
         speeds = process_input(snake, snake.snake_speeds)
@@ -167,14 +167,17 @@ def play():
         isApple, appleCoords = manage_apples(isApple, appleCoords, snake)
 
         run = snake.move_snake()
-        # sleep(0.02)
+        sleep(0.03)
     snake = None
 
-print(CONTROL_MODE)
+if CONTROL_MODE: print(CONTROL_MODE)
+controller_lights.reset_connection()
 sleep(2)
-controller_lights.cyc()
+controller_lights.blue()
 while True:
     play()
+    controller_lights.reset_connection()
     sleep(2)
     graphics.clear_screen()
     color_frame()
+    controller_lights.direction('a')

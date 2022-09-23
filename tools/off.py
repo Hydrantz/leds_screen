@@ -1,4 +1,3 @@
-import board
 import neopixel
 from leds_screen.screen import screen_configuration as screen_conf
 

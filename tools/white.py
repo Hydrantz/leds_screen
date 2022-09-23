@@ -1,5 +1,6 @@
-import board
-import neopixel
+import neopixel, sys
+from os.path import dirname, abspath
+sys.path.append(dirname(dirname(abspath(__file__))))
 
 from leds_screen.screen import screen_configuration as screen_conf
 

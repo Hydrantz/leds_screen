@@ -28,7 +28,7 @@ void setup() {
   // End of trinket special code
 
   pixels.begin(); // This initializes the NeoPixel library.
-  pixels.fill(pixels.Color(255,255,255));
+//  pixels.fill(pixels.Color(255,255,255));
   pixels.show();
 }
 
@@ -194,15 +194,13 @@ void white(String value) {
 }
 
 void Strobe(byte red, byte green, byte blue, int FlashDelay){
-  while(true) {
-    if (get_input()) { return; }
     setAll(red,green,blue);
     showStrip();
     delay(FlashDelay);
     setAll(0,0,0);
     showStrip();
     delay(FlashDelay);
-  }
+    first = "";
 }
 
 void loop() {
@@ -225,6 +223,6 @@ void loop() {
   }
   else if (first == "s") {
     Serial.println("strobe");
-    Strobe(0xff, 0xff, 0xff, 20);
+    Strobe(0xff, 0xff, 0xff, 100);
   }
 }

@@ -135,6 +135,7 @@ def manage_apples(isApple, appleCoords, snake: Snake):
     if appleCoords == (snakeX, snakeY):
         isApple = False
         snake.enlarge_snake()
+        # controller_lights.flash()
     else:
         graphics.draw_pixel(graphics.coords2led_index(*appleCoords), *graphics.GREEN)
     return (isApple, appleCoords)
@@ -173,7 +174,7 @@ def play():
 if CONTROL_MODE: print(CONTROL_MODE)
 controller_lights.reset_connection()
 sleep(2)
-controller_lights.blue()
+controller_lights.cyc()
 while True:
     play()
     controller_lights.reset_connection()

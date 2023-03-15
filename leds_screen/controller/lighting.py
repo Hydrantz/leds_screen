@@ -37,4 +37,8 @@ def white(value: str):
     if CONNECTED:
         ser.write(bytes("w|"+value, 'utf-8'))
 
+def flash():
+    if CONNECTED:
+        ser.write(b's')
+
 reset_connection()

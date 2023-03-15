@@ -9,12 +9,12 @@
 |GPIO 17|GPIO 18|
 |GPIO 27|GND    |
 |GPIO 22|GPIO 23|
-|3v3    |GPIO 24|
+|3v3    |GPIO 24<br> **controller SELECT**|
 |GPIO 10|GND    |
-|GPIO 9 |GPIO 25|
-|GPIO 11|GPIO 8 |
-|GND    |GPIO 7 |
-|GPIO 0 |GPIO 1 |
+|GPIO 9 |GPIO 25<br> **controller RIGHT**|
+|GPIO 11|GPIO 8 <br> **controller LEFT**|
+|GND    |GPIO 7 <br> **controller DOWN**|
+|GPIO 0 |GPIO 1 <br> **controller UP**|
 |GPIO 5 |GND    |
 |GPIO 6 |GPIO 12|
 |GPIO 13|GND    |

@@ -5,21 +5,8 @@ Controller Module
 ---
 """
 
-CONNECTED = None
+from controller import communication as comm
 
-try:
-    import serial
-    global ser
-    ser = serial.Serial(port="/dev/ttyACM0", baudrate=230400 , timeout=.1)
-    ser.flush()
-    CONNECTED = True
-except:
-    CONNECTED = False
-    print("running without controller lighting")
-
-def reset_connection():
-    if CONNECTED:
-        ser.flush()
 
 def blue():
     if CONNECTED:

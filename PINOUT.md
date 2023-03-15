@@ -1,6 +1,6 @@
 # GPIO PINOUT
 |  |  |
-|--|--|
+|:-:|:-:|
 |3v3    |5v     |
 |GPIO 2 |5v     |
 |GPIO 3 |GND    |

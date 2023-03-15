@@ -7,25 +7,19 @@ Controller Module
 
 from controller import communication as comm
 
-
 def blue():
-    if CONNECTED:
-        ser.write(bytes("b", 'utf-8'))
+    comm.transmit("b")
 
 def cyc():
-    if CONNECTED:
-        ser.write(bytes("c", 'utf-8'))
+    comm.transmit("c")
 
 def direction(value: str):
-    if CONNECTED:
-        ser.write(bytes("a|"+value, 'utf-8'))
+    comm.transmit("a|"+value)
 
 def white(value: str):
-    if CONNECTED:
-        ser.write(bytes("w|"+value, 'utf-8'))
+    comm.transmit("w|"+value)
 
 def flash():
-    if CONNECTED:
-        ser.write(b's')
+    comm.transmit("s")
 
-reset_connection()
+comm.reset_connection()

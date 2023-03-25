@@ -3,7 +3,7 @@ import random, sys
 from os.path import dirname, abspath
 sys.path.append(dirname(dirname(abspath(__file__))))
 from screen import graphics, screen_configuration as screen_conf
-from controller import buttons, lighting as controller_lights
+from controller import buttons, lighting as controller_lights, communication as comm
 
 HEIGHT = screen_conf.HEIGHT
 WIDTH = screen_conf.WIDTH
@@ -28,7 +28,7 @@ class Snake():
         self.snake_offsets = []
         
         for chain in range(self.snake_length-1+Snake.ABS_SPEED):
-            self.snake_offsets.append((0, -1))
+            self.snake_offsets.append((1, 0))
 
         self.draw_snake()
         self.snake_offsets = self.snake_offsets[:-Snake.ABS_SPEED]
@@ -83,15 +83,16 @@ else:
         new_speeds = prev_speeds
         keys = buttons.get_controls()
         if keys[0]:
-            new_speeds = (-1, 0)
-        elif keys[1]:
-            new_speeds = (1, 0)
-        elif keys[2]:
-            new_speeds = (0, 1)
-        elif keys[3]:
             new_speeds = (0, -1)
+        elif keys[1]:
+            new_speeds = (0, 1)
+        elif keys[2]:
+            new_speeds = (-1, 0)
+        elif keys[3]:
+            new_speeds = (1, 0)
         if new_speeds != prev_speeds:
             controller_lights.direction(speed_conversion(new_speeds))
+            pass
         return new_speeds
 
 def speed_conversion(speed: tuple):
@@ -135,7 +136,7 @@ def manage_apples(isApple, appleCoords, snake: Snake):
     if appleCoords == (snakeX, snakeY):
         isApple = False
         snake.enlarge_snake()
-        # controller_lights.flash()
+        controller_lights.flash()
     else:
         graphics.draw_pixel(graphics.coords2led_index(*appleCoords), *graphics.GREEN)
     return (isApple, appleCoords)
@@ -150,35 +151,35 @@ def color_frame():
 
 
 def play():
+    controller_lights.yellow()
     isApple = False
     appleCoords = None
     color_frame()
     snake = Snake()
     run = True
-    initial_speed = (0, 0)
+    initial_speed = (-1, 0)
     if CONTROL_MODE == "keyboard":
         keyboard.wait("left")
     else:
         buttons.wait_for("left")
-    controller_lights.direction("l")
+    # controller_lights.direction("l")
     process_input(snake, initial_speed)
     while run:
+        color_frame()
         speeds = process_input(snake, snake.snake_speeds)
         snake.snake_speeds = speeds
         isApple, appleCoords = manage_apples(isApple, appleCoords, snake)
 
         run = snake.move_snake()
-        sleep(0.03)
+        sleep(0.01)
     snake = None
 
 if CONTROL_MODE: print(CONTROL_MODE)
-controller_lights.reset_connection()
+comm.reset_connection()
 sleep(2)
-controller_lights.cyc()
 while True:
     play()
-    controller_lights.reset_connection()
+    comm.reset_connection()
     sleep(2)
     graphics.clear_screen()
-    color_frame()
     controller_lights.direction('a')

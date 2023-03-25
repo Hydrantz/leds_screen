@@ -7,13 +7,13 @@
 #define NUMPIXELS 56
 #define RX_CLOCK 2
 #define RX_DATA 3
+#define OUT 5
 
 
 Adafruit_NeoPixel pixels(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800);
 int bun_led_amount = 10;
 
-const int numChars = 16;
-char message[numChars];
+String message = "";
 volatile byte rx_byte = 0;
 volatile int bit_position = 0;
 volatile bool new_data = false;
@@ -25,27 +25,29 @@ String last = "";
 // should change this variable to int type in future
 String prev_bun = "";
 
-void (*current_effect)() = NULL;
+void (*current_effect)() = &blank;
 
 bool lighting_override = false;
   
 void setup() {
+  Serial.begin(115200);
   pixels.begin(); // This initializes the NeoPixel library.
-  set_effect_leds(255,255,255);
+  set_buns_leds(255,255,255);
   showStrip();
 
   // Communication setup
   pinMode(RX_DATA, INPUT);
-  strcpy(message, "");
+  pinMode(OUT, OUTPUT);
   attachInterrupt(digitalPinToInterrupt(RX_CLOCK), onClockPulse, RISING);
+  digitalWrite(OUT, LOW);
 }
 
 // Communication Functions
 // ========================
 
 void onClockPulse() {
+  digitalWrite(OUT, HIGH);
   bool rx_bit = digitalRead(RX_DATA);
-
   if (bit_position == 8) {
     rx_byte = 0;
     bit_position = 0;
@@ -60,13 +62,15 @@ void onClockPulse() {
   if (bit_position == 8) {
     const char *character = (const char *)&rx_byte;
     if (*character == '@') {
-      strcpy(data, message);
-      strcpy(message, "");
-      get_input();
-      return();
+      data = message;
+      message = "";
+      new_data = true;
+      digitalWrite(OUT, LOW);
+      return;
     }
-    strncat(message, character, 1);
+    message += *character;
   }
+  digitalWrite(OUT, LOW);
 }
 
 // Buttons Helper Functions
@@ -139,16 +143,22 @@ void setPixel(int Pixel, byte red, byte green, byte blue) {
  #endif
 }
 
-void set_effect_leds(byte red, byte green, byte blue) {
-  for(int i = bun_led_amount; i < NUMPIXELS; i++ ) {
+void set_multi_leds(byte red, byte green, byte blue, int start, int end) {
+  for(int i = start; i < end; i++ ) {
     setPixel(i, red, green, blue);
   }
 }
 
+void set_effect_leds(byte red, byte green, byte blue) {
+  set_multi_leds(red, green, blue, bun_led_amount, NUMPIXELS);
+}
+
 void set_buns_leds(byte red, byte green, byte blue) {
-  for(int i = 0; i < bun_led_amount; i++ ) {
-    setPixel(i, red, green, blue);
-  }
+  set_multi_leds(red, green, blue, 0, bun_led_amount);
+}
+
+void set_all_leds(byte red, byte green, byte blue) {
+  set_multi_leds(red, green, blue, 0, NUMPIXELS);
 }
 
 // Helper Effects
@@ -185,10 +195,10 @@ void mono_color_cycle(byte red, byte green, byte blue) {
   set_effect_leds(0,0,0);
   for(int i=bun_led_amount;i<NUMPIXELS;i++){
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-    setPixel(i, red, blue, green); // Moderately bright green color.
+    setPixel(i, red, green, blue); // Moderately bright green color.
     showEffect(); // This sends the updated pixel color to the hardware.
     delay(10); // Delay for a period of time (in milliseconds).
-    if (get_input()) { return; }
+    if (new_data) { return; }
   }
 }
 
@@ -202,12 +212,16 @@ void strobe(byte red, byte green, byte blue, int FlashDelay){
 }
 
 void mono_color(byte red, byte green, byte blue) {
-  set_effect_leds(red, blue, green);
+  set_effect_leds(red, green, blue);
   showEffect(); // This sends the updated pixel color to the hardware.
 }
 
 // Effects
 // ========================
+
+void blank() {
+  mono_color(0,0,0);
+}
 
 void yellow() {
   mono_color(255,255,0);
@@ -222,7 +236,7 @@ void red_cylon() {
 }
 
 void white_strobe() {
-  strobe(0xff, 0xff, 0xff, 20)
+  strobe(0xff, 0xff, 0xff, 20);
 }
 
 // Main Loop
@@ -245,31 +259,30 @@ void get_input() {
       lighting_override = false;
     }
     else {
-      void (*new_effect)();
-
-      if (first == "y") {
-        new_effect = &yellow;
+      if (first == "blank") {
+        current_effect = &blank;
+      }
+      else if (first == "y") {
+        current_effect = &yellow;
       }
       else if (first == "b") {
-        new_effect = &blue; 
+        current_effect = &blue; 
       }
       else if (first == "c") {
-        new_effect = &red_cylon;
+        current_effect = &red_cylon;
       }
       else if (first == "s") {
-        new_effect = &white_strobe;
-      }
-
-      if (new_effect != current_effect) {
-        new_data = true;
-        current_effect = new_effect;
+        current_effect = &white_strobe;
       }
     }
 }
 
 void loop() {
   if (new_data) {
+    get_input();
     new_data = false;   
   }
-  *current_effect();
+  else {
+  (*current_effect)();
+  }
 }

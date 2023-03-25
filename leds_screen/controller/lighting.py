@@ -10,6 +10,9 @@ from controller import communication as comm
 def blue():
     comm.transmit("b")
 
+def yellow():
+    comm.transmit("y")
+
 def cyc():
     comm.transmit("c")
 

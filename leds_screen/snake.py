@@ -151,18 +151,18 @@ def color_frame():
 
 
 def play():
-    controller_lights.yellow()
     isApple = False
     appleCoords = None
     color_frame()
     snake = Snake()
     run = True
     initial_speed = (-1, 0)
+    controller_lights.yellow()
+    controller_lights.direction("l")
     if CONTROL_MODE == "keyboard":
         keyboard.wait("left")
     else:
         buttons.wait_for("left")
-    # controller_lights.direction("l")
     process_input(snake, initial_speed)
     while run:
         color_frame()
@@ -171,15 +171,15 @@ def play():
         isApple, appleCoords = manage_apples(isApple, appleCoords, snake)
 
         run = snake.move_snake()
-        sleep(0.01)
+        sleep(0.03)
     snake = None
 
 if CONTROL_MODE: print(CONTROL_MODE)
 comm.reset_connection()
+controller_lights.direction('a')
 sleep(2)
 while True:
     play()
-    comm.reset_connection()
+    controller_lights.blank()
     sleep(2)
     graphics.clear_screen()
-    controller_lights.direction('a')

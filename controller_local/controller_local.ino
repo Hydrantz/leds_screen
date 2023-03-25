@@ -30,7 +30,8 @@ void (*current_effect)() = &blank;
 bool lighting_override = false;
   
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
+  Serial.setTimeout(100);
   pixels.begin(); // This initializes the NeoPixel library.
   set_buns_leds(255,255,255);
   showStrip();
@@ -278,6 +279,10 @@ void get_input() {
 }
 
 void loop() {
+  if (Serial.available() > 0) {
+    data = Serial.readStringUntil('@');
+    new_data = true;
+  }
   if (new_data) {
     get_input();
     new_data = false;   

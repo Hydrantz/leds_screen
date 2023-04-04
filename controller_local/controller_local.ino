@@ -7,8 +7,6 @@
 #define NUMPIXELS 56
 #define RX_CLOCK 2
 #define RX_DATA 3
-#define OUT 5
-
 
 Adafruit_NeoPixel pixels(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800);
 int bun_led_amount = 10;
@@ -22,7 +20,6 @@ String data = "";
 String first = "";
 String last = "";
 
-// should change this variable to int type in future
 String prev_bun = "";
 
 void (*current_effect)() = &blank;
@@ -38,16 +35,13 @@ void setup() {
 
   // Communication setup
   pinMode(RX_DATA, INPUT);
-  pinMode(OUT, OUTPUT);
   attachInterrupt(digitalPinToInterrupt(RX_CLOCK), onClockPulse, RISING);
-  digitalWrite(OUT, LOW);
 }
 
 // Communication Functions
 // ========================
 
 void onClockPulse() {
-  digitalWrite(OUT, HIGH);
   bool rx_bit = digitalRead(RX_DATA);
   if (bit_position == 8) {
     rx_byte = 0;
@@ -66,12 +60,10 @@ void onClockPulse() {
       data = message;
       message = "";
       new_data = true;
-      digitalWrite(OUT, LOW);
       return;
     }
     message += *character;
   }
-  digitalWrite(OUT, LOW);
 }
 
 // Buttons Helper Functions

@@ -5,26 +5,32 @@
 
 #define NEO_PIN 6
 #define NUMPIXELS 56
+
+// Manual communication pins
 #define RX_CLOCK 2
 #define RX_DATA 3
 
 Adafruit_NeoPixel pixels(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800);
-int bun_led_amount = 10;
 
+int bun_led_amount = 10; // how many leds are in the buttons
+
+// Communication variables
 String message = "";
 volatile byte rx_byte = 0;
 volatile int bit_position = 0;
 volatile bool new_data = false;
 
-String data = "";
-String first = "";
-String last = "";
+// Current data variables
+String data = ""; // whole data
+String first = ""; // command
+String last = ""; // argument
+String bun_state = ""; // state of buttons
+void (*current_effect)() = &blank; // Current showing effect
 
-String prev_bun = "";
-
-void (*current_effect)() = &blank;
-
+// Effects Variables
 bool lighting_override = false;
+int effect_last_time = 0;
+int effect_step = 0;
   
 void setup() {
   Serial.begin(9600);
@@ -70,7 +76,7 @@ void onClockPulse() {
 // =========================
 
 void manage_buns(String direction) {
-  if (direction == prev_bun){
+  if (direction == bun_state){
     return;
   }
   else if (direction != "u" &&
@@ -81,7 +87,7 @@ void manage_buns(String direction) {
             return;
            }
   else {
-    prev_bun = direction;
+    bun_state = direction;
   }
   set_buns_leds(255,255,255);
   if (direction == "u") {
@@ -124,6 +130,7 @@ void showEffect() {
 }
 
 void setPixel(int Pixel, byte red, byte green, byte blue) {
+//  Serial.println(blue);
  #ifdef ADAFRUIT_NEOPIXEL_H
    // NeoPixel
    pixels.setPixelColor(Pixel, pixels.Color(red, green, blue));
@@ -185,28 +192,52 @@ void CylonBounce(byte red, byte green, byte blue, int EyeSize, int SpeedDelay, i
 }
 
 void mono_color_cycle(byte red, byte green, byte blue) {
-  set_effect_leds(0,0,0);
-  for(int i=bun_led_amount;i<NUMPIXELS;i++){
-    // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-    setPixel(i, red, green, blue); // Moderately bright green color.
-    showEffect(); // This sends the updated pixel color to the hardware.
-    delay(10); // Delay for a period of time (in milliseconds).
-    if (new_data) { return; }
+  int delay = 10; // Delay time between steps in milliseconds
+  int cur_time = millis();
+  // Manage Delay
+  if (cur_time - effect_last_time < delay){
+    return;
   }
+  effect_last_time = cur_time;
+  if (effect_step >= NUMPIXELS){
+    effect_step = 0;
+  }
+  if (effect_step == 0) {
+    set_effect_leds(0,0,0);
+  }
+  int i = bun_led_amount + effect_step;
+  setPixel(i, red, green, blue);
+  showEffect(); // This sends the updated pixel color to the hardware.
+  effect_step += 1;
 }
 
 void strobe(byte red, byte green, byte blue, int FlashDelay){
-  set_effect_leds(red,green,blue);
+  int cur_time = millis();
+  // Manage Delay
+  if (cur_time - effect_last_time < FlashDelay){
+    return;
+  }
+  effect_last_time = cur_time;
+  if (effect_step >= 2){
+    effect_step = 0;
+  }
+  if (effect_step == 0) {
+    set_effect_leds(red,green,blue);
+    effect_step = 1;
+  }
+  else {
+    set_effect_leds(0,0,0);
+    effect_step = 0;
+  }
   showEffect();
-  delay(FlashDelay);
-  set_effect_leds(0,0,0);
-  showEffect();
-  delay(FlashDelay);
 }
 
 void mono_color(byte red, byte green, byte blue) {
-  set_effect_leds(red, green, blue);
-  showEffect(); // This sends the updated pixel color to the hardware.
+  if (effect_step < 9999){
+      set_effect_leds(red, green, blue);
+      showEffect(); // This sends the updated pixel color to the hardware.
+      effect_step = 9999;
+  }
 }
 
 // Effects
@@ -236,50 +267,44 @@ void white_strobe() {
 // ============================
 
 void get_input() {
-    int ind = data.indexOf('|');
-    first = data.substring(0, ind);
-    last = data.substring(ind+1);
-    if (first == "a") {
-      manage_buns(last);
+  int ind = data.indexOf('|');
+  first = data.substring(0, ind);
+  last = data.substring(ind+1);
+  if (first == "a") {
+    manage_buns(last);
+  }
+  else if (first == "w"){
+    bun_state = true;
+    int intensity = last.toInt();
+    mono_color(intensity,intensity,intensity);
+    showStrip();
+  }
+  else if (first == "release"){
+    bun_state = false;
+  }
+  else {
+    if (first == "blank") {
+      current_effect = &blank;
     }
-    else if (first == "w"){
-      lighting_override = true;
-      int intensity = last.toInt();
-      mono_color(intensity,intensity,intensity);
-      showStrip();
+    else if (first == "y") {
+      current_effect = &yellow;
     }
-    else if (first == "release"){
-      lighting_override = false;
+    else if (first == "b") {
+      current_effect = &blue; 
     }
-    else {
-      if (first == "blank") {
-        current_effect = &blank;
-      }
-      else if (first == "y") {
-        current_effect = &yellow;
-      }
-      else if (first == "b") {
-        current_effect = &blue; 
-      }
-      else if (first == "c") {
-        current_effect = &red_cylon;
-      }
-      else if (first == "s") {
-        current_effect = &white_strobe;
-      }
+    else if (first == "c") {
+      current_effect = &red_cylon;
     }
+    else if (first == "s") {
+      current_effect = &white_strobe;
+    }
+  }
 }
 
 void loop() {
   if (Serial.available() > 0) {
     data = Serial.readStringUntil('@');
-    new_data = true;
-  }
-  if (new_data) {
     get_input();
-    new_data = false;   
   }
-  else {
   (*current_effect)();
-  }
 }

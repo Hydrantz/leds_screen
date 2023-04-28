@@ -17,7 +17,7 @@ class Communication {
       argument = "";
     }
 
-    void get_input(Controller ctrl) {
+    void get_input(Controller &ctrl) {
       data = Serial.readStringUntil('@');
       command = data[0];
       argument = data.substring(1);

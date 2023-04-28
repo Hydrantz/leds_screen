@@ -1,4 +1,4 @@
-#include "classes/controller.h"
+#include "controller.h"
 #include "Arduino.h"
 #include <Adafruit_NeoPixel.h>
 
@@ -12,12 +12,12 @@ Controller::Controller(
     this->led_strip = led_strip;
     this->strip_length = strip_length;
     this->bun_led_length = bun_led_length;
-    this->current_effect = &this->blank;
     this->effect_last_time = 0;
     this->effect_step = 0;
     this->lighting_override = false;
+    this->current_effect = 1;
     this->current_direction = BUTTON_ERROR;
-    this->button_color = {255, 255, 255};
+    this->button_color = {24, 84, 128};
     this->sel_bun_enabled = true;
 }
 
@@ -90,33 +90,33 @@ void Controller::update_buttons(Buttons direction) {
     return;
 }
 
-void Controller::update_effect(Effect effect) {
-    Serial.println(effect);
-    if (effect >= EFFECT_ERROR){
+void Controller::update_effect(int new_effect) {
+    if (new_effect >= 6){
         return;
     }
-    switch (effect) {
-        case effect_blank:
-            current_effect = &blank;
-            break;
-        case effect_blue:
-            current_effect = &blue;
-            break;
-        case effect_yellow:
-            current_effect = &yellow;
-            break;
-        case effect_cylon:
-            current_effect = &red_cylon;
-            break;
-        case effect_strobe:
-            current_effect = &white_strobe;
-            break;
-    }
+    this->current_effect = new_effect;
     return;
 }
 
 void Controller::fire_effect(){
-    (this->*current_effect)();
+    switch (this->current_effect) {
+        case effect_blank:
+            this->blank();
+            break;
+        case effect_blue:
+            this->blue();
+            break;
+        case effect_yellow:
+            this->yellow();
+            break;
+        case effect_cylon:
+            this->red_cylon();
+            break;
+        case effect_strobe:
+            this->white_strobe();
+            break;
+    }
+    return;
 }
 
 // Effects Helper Functions

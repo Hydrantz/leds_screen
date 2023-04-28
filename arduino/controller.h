@@ -33,18 +33,21 @@ class Controller {
     private:
         Adafruit_NeoPixel* led_strip;
         int strip_length;
-        int bun_led_length; // how many leds are in the buttons
+        int bun_led_length; // how many leds are in all of the buttons
         bool lighting_override;
         int effect_last_time;
         int effect_step;
+        int current_effect;
         Buttons current_direction;
         Color button_color;
         bool sel_bun_enabled;
-        void (Controller::*current_effect)(); // Current showing effect
 
     public:
         Controller(Adafruit_NeoPixel* led_strip,int strip_length,int bun_led_length);
-
+        Controller(Controller&) = delete;
+        Controller(const Controller&) = delete;
+        Controller& operator=(Controller&) = delete;
+        const Controller& operator=(const Controller&) = delete;
 
         // Led Strip Control Functions
         // ===========================
@@ -72,7 +75,7 @@ class Controller {
                             byte green,
                             byte blue); // sets color of every single led
         void fire_effect(); // runs a step of current effect
-        void update_effect(Effect effect);
+        void update_effect(int new_effect);
         void update_buttons(Buttons direction); // updates buttons lighting
 
         // Effects Helper Functions

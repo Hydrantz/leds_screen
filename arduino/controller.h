@@ -3,9 +3,23 @@
 
 #include "Arduino.h"
 #include <Adafruit_NeoPixel.h>
-
-
 class Controller {
+    struct Color {
+        int r;
+        int g;
+        int b;
+    };
+
+    enum Buttons : int{
+        up,
+        down,
+        left,
+        right,
+        all,
+        
+        ERROR
+    };
+
     private:
         Adafruit_NeoPixel* led_strip;
         int strip_length;
@@ -13,6 +27,9 @@ class Controller {
         bool lighting_override;
         int effect_last_time;
         int effect_step;
+        Buttons current_direction;
+        Color button_color;
+        bool sel_bun_enabled;
 
     public:
         Controller(Adafruit_NeoPixel* led_strip,int strip_length,int bun_led_length);
@@ -22,7 +39,6 @@ class Controller {
         // Led Strip Control Functions
         // ===========================
 
-        void fireEffect();
         void showStrip(); // updates led strip
         void showEffect(); // updates led strip only if effects are not overriden
         void setPixel(  int Pixel,
@@ -34,15 +50,19 @@ class Controller {
                             byte blue,
                             int start,
                             int end); // sets color of a pixels range
+        void turnoff_two_leds(int i, int j);
         void set_effect_leds(   byte red,
                                 byte green,
                                 byte blue); // sets color of all effect leds
         void set_buns_leds( byte red,
                             byte green,
                             byte blue); // sets color of all buttons leds
+        void set_buns_leds_default(); // sets color of all buttons leds to default color
         void set_all_leds(  byte red,
                             byte green,
                             byte blue); // sets color of every single led
+        void fire_effect(); // runs a step of current effect
+        void update_buttons(Buttons direction); // updates buttons lighting
 
         // Effects Helper Functions
         // ========================

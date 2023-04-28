@@ -12,7 +12,6 @@ Adafruit_NeoPixel pixels(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800);
 String data = ""; // whole data
 String first = ""; // command
 String last = ""; // argument
-String bun_state = ""; // state of buttons
 
 Controller ctrl( &pixels, NUMPIXELS, BUNS_LENGTH);
   
@@ -20,45 +19,15 @@ void setup() {
   Serial.begin(9600);
   Serial.setTimeout(100);
   pixels.begin(); // This initializes the NeoPixel library.
-  ctrl.set_buns_leds(255,255,255);
-  ctrl.showStrip();
+//  ctrl.set_buns_leds_default();
+//  ctrl.showStrip();
 }
 
 // Buttons Helper Functions
 // =========================
 
 void manage_buns(String direction) {
-  if (direction == bun_state){
-    return;
-  }
-  else if (direction != "u" &&
-           direction != "d" &&
-           direction != "l" &&
-           direction != "r" &&
-           direction != "a") {
-            return;
-           }
-  else {
-    bun_state = direction;
-  }
-  ctrl.set_buns_leds(255,255,255);
-  if (direction == "u") {
-     ctrl.setPixel(2,0,0,0);
-     ctrl.setPixel(3,0,0,0);
-  }
-  else if (direction == "d") {
-     ctrl.setPixel(0,0,0,0);
-     ctrl.setPixel(1,0,0,0);
-  }
-  else if (direction == "l") {
-     ctrl.setPixel(6,0,0,0);
-     ctrl.setPixel(7,0,0,0);
-  }
-  else if (direction == "r") {
-     ctrl.setPixel(4,0,0,0);
-     ctrl.setPixel(5,0,0,0);
-  }
-  ctrl.showStrip();
+  ctrl.update_buttons(direction[0]-48);
 }
 
 // Main Loop
@@ -97,5 +66,5 @@ void loop() {
     data = Serial.readStringUntil('@');
     get_input();
   }
-   ctrl.fireEffect();
+   ctrl.fire_effect();
 }

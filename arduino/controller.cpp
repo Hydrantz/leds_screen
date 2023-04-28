@@ -16,9 +16,12 @@ Controller::Controller(
     this->effect_last_time = 0;
     this->effect_step = 0;
     this->lighting_override = false;
+    this->current_direction = ERROR;
+    this->button_color = {100, 255, 20};
+    this->sel_bun_enabled = true;
 }
 
-void Controller::fireEffect(){
+void Controller::fire_effect(){
     (this->*current_effect)();
 }
 
@@ -41,14 +44,54 @@ void Controller::set_multi_leds(byte red, byte green, byte blue, int start, int 
         setPixel(i, red, green, blue);
     }
 }
+void Controller::turnoff_two_leds(int i, int j){
+    setPixel(i,0,0,0);
+    setPixel(j,0,0,0);
+    return;
+}
 void Controller::set_effect_leds(byte red, byte green, byte blue) {
     set_multi_leds(red, green, blue, bun_led_length, strip_length);
 }
 void Controller::set_buns_leds(byte red, byte green, byte blue) {
     set_multi_leds(red, green, blue, 0, bun_led_length);
 }
+void Controller::set_buns_leds_default() {
+    set_buns_leds(this->button_color.r,this->button_color.g,this->button_color.b);
+}
 void Controller::set_all_leds(byte red, byte green, byte blue) {
     set_multi_leds(red, green, blue, 0, strip_length);
+}
+
+void Controller::update_buttons(Buttons direction) {
+        if (direction >= ERROR){
+            return;
+        }
+        if (direction == this->current_direction){
+            return;
+        }
+        set_buns_leds_default();
+        if (!this->sel_bun_enabled){
+            turnoff_two_leds(8,9);
+        }
+        switch (direction) {
+            case up:
+                turnoff_two_leds(2,3);
+                break;
+
+            case down:
+                turnoff_two_leds(0,1);
+                break;
+
+            case left:
+                turnoff_two_leds(6,7);
+                break;
+
+            case right:
+                turnoff_two_leds(4,5);
+                break;
+        }
+        this->showEffect();
+        return;
 }
 
 // Effects Helper Functions
@@ -123,11 +166,19 @@ void Controller::strobe(byte red, byte green, byte blue, int FlashDelay){
 }
 
 void Controller::mono_color(byte red, byte green, byte blue) {
-    if (effect_step < 9999){
-        set_effect_leds(red, green, blue);
-        showEffect(); // This sends the updated pixel color to the hardware.
-        effect_step = 9999;
+
+    int delay = 100; // Delay time between steps in milliseconds
+    int cur_time = millis();
+    // Manage Delay
+    if (cur_time - effect_last_time < delay){
+        return;
     }
+    effect_last_time = cur_time;
+    effect_step = 0;
+    set_effect_leds(red, green, blue);
+    showEffect(); // This sends the updated pixel color to the hardware.
+
+
 }
 
 // Effects

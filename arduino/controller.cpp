@@ -12,17 +12,13 @@ Controller::Controller(
     this->led_strip = led_strip;
     this->strip_length = strip_length;
     this->bun_led_length = bun_led_length;
-    this->current_effect = &this->blank;
     this->effect_last_time = 0;
     this->effect_step = 0;
     this->lighting_override = false;
-    this->current_direction = ERROR;
-    this->button_color = {100, 255, 20};
+    this->current_effect = 1;
+    this->current_direction = BUTTON_ERROR;
+    this->button_color = {24, 84, 128};
     this->sel_bun_enabled = true;
-}
-
-void Controller::fire_effect(){
-    (this->*current_effect)();
 }
 
 // Led Strip Control Functions
@@ -63,35 +59,64 @@ void Controller::set_all_leds(byte red, byte green, byte blue) {
 }
 
 void Controller::update_buttons(Buttons direction) {
-        if (direction >= ERROR){
-            return;
-        }
-        if (direction == this->current_direction){
-            return;
-        }
-        set_buns_leds_default();
-        if (!this->sel_bun_enabled){
-            turnoff_two_leds(8,9);
-        }
-        switch (direction) {
-            case up:
-                turnoff_two_leds(2,3);
-                break;
-
-            case down:
-                turnoff_two_leds(0,1);
-                break;
-
-            case left:
-                turnoff_two_leds(6,7);
-                break;
-
-            case right:
-                turnoff_two_leds(4,5);
-                break;
-        }
-        this->showEffect();
+    if (direction >= BUTTON_ERROR){
         return;
+    }
+    if (direction == this->current_direction){
+        return;
+    }
+    set_buns_leds_default();
+    if (!this->sel_bun_enabled){
+        turnoff_two_leds(8,9);
+    }
+    switch (direction) {
+        case up:
+            turnoff_two_leds(2,3);
+            break;
+
+        case down:
+            turnoff_two_leds(0,1);
+            break;
+
+        case left:
+            turnoff_two_leds(6,7);
+            break;
+
+        case right:
+            turnoff_two_leds(4,5);
+            break;
+    }
+    this->showStrip();
+    return;
+}
+
+void Controller::update_effect(int new_effect) {
+    if (new_effect >= 6){
+        return;
+    }
+    this->current_effect = new_effect;
+    return;
+}
+
+void Controller::fire_effect(){
+    switch (this->current_effect) {
+        case effect_blank:
+            this->blank();
+            break;
+        case effect_blue:
+            this->blue();
+            break;
+        case effect_yellow:
+            this->yellow();
+            break;
+        case effect_cylon:
+            this->red_cylon();
+            break;
+        case effect_strobe:
+            this->white_strobe();
+            break;
+    }
+    return;
 }
 
 // Effects Helper Functions

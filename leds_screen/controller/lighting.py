@@ -13,6 +13,9 @@ LEFT = 3
 RIGHT = 4
 ALL = 5
 
+def transmit_effect(effect_id: int):
+    comm.transmit("e"+str(effect_id))
+
 def speed2direction(speed: tuple):
     if speed[0] == 0:
         if speed[1] == 1:
@@ -23,24 +26,24 @@ def speed2direction(speed: tuple):
     return LEFT
 
 def blue():
-    comm.transmit(2)
+    transmit_effect(2)
 
 def blank():
-    comm.transmit(1)
+    transmit_effect(1)
 
 def yellow():
-    comm.transmit(3)
+    transmit_effect(3)
 
 def cyc():
-    comm.transmit(4)
+    transmit_effect(4)
 
 def direction(value: int):
-    comm.transmit("a|"+str(value))
+    comm.transmit("a"+str(value))
 
 def white(value: str):
-    comm.transmit("w|"+value)
+    transmit_effect("w"+value)
 
 def flash():
-    comm.transmit(5)
+    transmit_effect(5)
 
 comm.reset_connection()

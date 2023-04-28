@@ -1,4 +1,4 @@
-#include "controller.h"
+#include "classes/controller.h"
 #include "Arduino.h"
 #include <Adafruit_NeoPixel.h>
 
@@ -16,13 +16,9 @@ Controller::Controller(
     this->effect_last_time = 0;
     this->effect_step = 0;
     this->lighting_override = false;
-    this->current_direction = ERROR;
-    this->button_color = {100, 255, 20};
+    this->current_direction = BUTTON_ERROR;
+    this->button_color = {255, 255, 255};
     this->sel_bun_enabled = true;
-}
-
-void Controller::fire_effect(){
-    (this->*current_effect)();
 }
 
 // Led Strip Control Functions
@@ -63,35 +59,64 @@ void Controller::set_all_leds(byte red, byte green, byte blue) {
 }
 
 void Controller::update_buttons(Buttons direction) {
-        if (direction >= ERROR){
-            return;
-        }
-        if (direction == this->current_direction){
-            return;
-        }
-        set_buns_leds_default();
-        if (!this->sel_bun_enabled){
-            turnoff_two_leds(8,9);
-        }
-        switch (direction) {
-            case up:
-                turnoff_two_leds(2,3);
-                break;
-
-            case down:
-                turnoff_two_leds(0,1);
-                break;
-
-            case left:
-                turnoff_two_leds(6,7);
-                break;
-
-            case right:
-                turnoff_two_leds(4,5);
-                break;
-        }
-        this->showEffect();
+    if (direction >= BUTTON_ERROR){
         return;
+    }
+    if (direction == this->current_direction){
+        return;
+    }
+    set_buns_leds_default();
+    if (!this->sel_bun_enabled){
+        turnoff_two_leds(8,9);
+    }
+    switch (direction) {
+        case up:
+            turnoff_two_leds(2,3);
+            break;
+
+        case down:
+            turnoff_two_leds(0,1);
+            break;
+
+        case left:
+            turnoff_two_leds(6,7);
+            break;
+
+        case right:
+            turnoff_two_leds(4,5);
+            break;
+    }
+    this->showStrip();
+    return;
+}
+
+void Controller::update_effect(Effect effect) {
+    Serial.println(effect);
+    if (effect >= EFFECT_ERROR){
+        return;
+    }
+    switch (effect) {
+        case effect_blank:
+            current_effect = &blank;
+            break;
+        case effect_blue:
+            current_effect = &blue;
+            break;
+        case effect_yellow:
+            current_effect = &yellow;
+            break;
+        case effect_cylon:
+            current_effect = &red_cylon;
+            break;
+        case effect_strobe:
+            current_effect = &white_strobe;
+            break;
+    }
+    return;
+}
+
+void Controller::fire_effect(){
+    (this->*current_effect)();
 }
 
 // Effects Helper Functions

@@ -7,11 +7,11 @@ Controller Module
 
 from controller import communication as comm
 
-UP = 0;
-DOWN = 1;
-LEFT = 2;
-RIGHT = 3;
-ALL = 4
+UP = 1
+DOWN = 2
+LEFT = 3
+RIGHT = 4
+ALL = 5
 
 def speed2direction(speed: tuple):
     if speed[0] == 0:
@@ -23,16 +23,16 @@ def speed2direction(speed: tuple):
     return LEFT
 
 def blue():
-    comm.transmit("b")
+    comm.transmit(2)
 
 def blank():
-    comm.transmit("blank")
+    comm.transmit(1)
 
 def yellow():
-    comm.transmit("y")
+    comm.transmit(3)
 
 def cyc():
-    comm.transmit("c")
+    comm.transmit(4)
 
 def direction(value: int):
     comm.transmit("a|"+str(value))
@@ -41,6 +41,6 @@ def white(value: str):
     comm.transmit("w|"+value)
 
 def flash():
-    comm.transmit("s")
+    comm.transmit(5)
 
 comm.reset_connection()

@@ -2,6 +2,8 @@
 #include "Arduino.h"
 #include <Adafruit_NeoPixel.h>
 
+Color color_none = {0,0,0};
+
 // Constructors
 // ===========================
 
@@ -32,30 +34,30 @@ void Controller::showEffect() {
         showStrip();
     }
 }
-void Controller::setPixel(int Pixel, byte red, byte green, byte blue) {
-    led_strip->setPixelColor(Pixel, led_strip->Color(red, green, blue));
+void Controller::setPixel(int Pixel, Color color) {
+    led_strip->setPixelColor(Pixel, led_strip->Color(color.r, color.g, color.b));
 }
-void Controller::set_multi_leds(byte red, byte green, byte blue, int start, int end) {
+void Controller::set_multi_leds(Color color, int start, int end) {
     for(int i = start; i < end; i++ ) {
-        setPixel(i, red, green, blue);
+        setPixel(i, color);
     }
 }
 void Controller::turnoff_two_leds(int i, int j){
-    setPixel(i,0,0,0);
-    setPixel(j,0,0,0);
+    setPixel(i,color_none);
+    setPixel(j,color_none);
     return;
 }
-void Controller::set_effect_leds(byte red, byte green, byte blue) {
-    set_multi_leds(red, green, blue, bun_led_length, strip_length);
+void Controller::set_effect_leds(Color color) {
+    set_multi_leds(color, bun_led_length, strip_length);
 }
-void Controller::set_buns_leds(byte red, byte green, byte blue) {
-    set_multi_leds(red, green, blue, 0, bun_led_length);
+void Controller::set_buns_leds(Color color) {
+    set_multi_leds(color, 0, bun_led_length);
 }
 void Controller::set_buns_leds_default() {
-    set_buns_leds(this->button_color.r,this->button_color.g,this->button_color.b);
+    set_buns_leds(this->button_color);
 }
-void Controller::set_all_leds(byte red, byte green, byte blue) {
-    set_multi_leds(red, green, blue, 0, strip_length);
+void Controller::set_all_leds(Color color) {
+    set_multi_leds(color, 0, strip_length);
 }
 
 void Controller::update_buttons(Buttons direction) {
@@ -90,8 +92,8 @@ void Controller::update_buttons(Buttons direction) {
     return;
 }
 
-void Controller::update_effect(int new_effect) {
-    if (new_effect >= 6){
+void Controller::update_effect(Effect new_effect) {
+    if (new_effect >= EFFECT_ERROR){
         return;
     }
     this->current_effect = new_effect;
@@ -122,34 +124,35 @@ void Controller::fire_effect(){
 // Effects Helper Functions
 // ========================
 
-void Controller::CylonBounce(byte red, byte green, byte blue, int EyeSize, int SpeedDelay, int ReturnDelay){
+void Controller::CylonBounce(Color color, int EyeSize, int SpeedDelay, int ReturnDelay){
+    Color faded_color = {color.r/10, color.g/10, color.b/10};
     for(int i = bun_led_length; i < strip_length -EyeSize-2; i++) {
-        set_effect_leds(0,0,0);
-        setPixel(i, red/10, green/10, blue/10);
+        set_effect_leds(color_none);
+        setPixel(i, faded_color);
         for(int j = 1; j <= EyeSize; j++) {
     //      if (new_data) { return; }
-        setPixel(i+j, red, green, blue);
+        setPixel(i+j, color);
         }
-        setPixel(i+EyeSize+1, red/10, green/10, blue/10);
+        setPixel(i+EyeSize+1, faded_color);
         showEffect();
         delay(SpeedDelay);
     }
     delay(ReturnDelay);
     for(int i = strip_length-EyeSize-2; i > bun_led_length; i--) {
-        set_effect_leds(0,0,0);
-        setPixel(i, red/10, green/10, blue/10);
+        set_effect_leds(color_none);
+        setPixel(i, faded_color);
         for(int j = 1; j <= EyeSize; j++) {
     //      if (new_data) { return; }
-        setPixel(i+j, red, green, blue);
+        setPixel(i+j, color);
         }
-        setPixel(i+EyeSize+1, red/10, green/10, blue/10);
+        setPixel(i+EyeSize+1, faded_color);
         showEffect();
         delay(SpeedDelay);
     }
     delay(ReturnDelay);
 }
 
-void Controller::mono_color_cycle(byte red, byte green, byte blue) {
+void Controller::mono_color_cycle(Color color) {
     int delay = 10; // Delay time between steps in milliseconds
     int cur_time = millis();
     // Manage Delay
@@ -161,15 +164,15 @@ void Controller::mono_color_cycle(byte red, byte green, byte blue) {
         effect_step = 0;
     }
     if (effect_step == 0) {
-        set_effect_leds(0,0,0);
+        set_effect_leds(color_none);
     }
     int i = bun_led_length + effect_step;
-    setPixel(i, red, green, blue);
+    setPixel(i, color);
     showEffect(); // This sends the updated pixel color to the hardware.
     effect_step += 1;
 }
 
-void Controller::strobe(byte red, byte green, byte blue, int FlashDelay){
+void Controller::strobe(Color color, int FlashDelay){
     int cur_time = millis();
     // Manage Delay
     if (cur_time - effect_last_time < FlashDelay){
@@ -180,17 +183,17 @@ void Controller::strobe(byte red, byte green, byte blue, int FlashDelay){
         effect_step = 0;
     }
     if (effect_step == 0) {
-        set_effect_leds(red,green,blue);
+        set_effect_leds(color);
         effect_step = 1;
     }
     else {
-        set_effect_leds(0,0,0);
+        set_effect_leds(color_none);
         effect_step = 0;
     }
     showEffect();
 }
 
-void Controller::mono_color(byte red, byte green, byte blue) {
+void Controller::mono_color(Color color) {
 
     int delay = 100; // Delay time between steps in milliseconds
     int cur_time = millis();
@@ -200,7 +203,7 @@ void Controller::mono_color(byte red, byte green, byte blue) {
     }
     effect_last_time = cur_time;
     effect_step = 0;
-    set_effect_leds(red, green, blue);
+    set_effect_leds(color);
     showEffect(); // This sends the updated pixel color to the hardware.
 
 
@@ -210,21 +213,21 @@ void Controller::mono_color(byte red, byte green, byte blue) {
 // ========================
 
 void Controller::blank() {
-    mono_color(0,0,0);
+    mono_color(color_none);
 }
 
 void Controller::yellow() {
-    mono_color(255,255,0);
+    mono_color({255,255,0});
 }
 
 void Controller::blue() {
-    mono_color_cycle(0,0,255);
+    mono_color_cycle({0,0,255});
 }
 
 void Controller::red_cylon() {
-    CylonBounce(0xff, 0, 0, 4, 10, 50);
+    CylonBounce({255, 0, 0}, 4, 10, 50);
 }
 
 void Controller::white_strobe() {
-    strobe(0xff, 0xff, 0xff, 20);
+    strobe({255,255,255}, 20);
 }

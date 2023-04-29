@@ -14,7 +14,6 @@ void Communication::get_input(Controller &ctrl) {
     }    
     this->rx_char = Serial.read();
     if (this->rx_char == '@'){
-        Serial.println(this->data);
         this->command = this->data[0];
         this->argument = this->data.substring(1);
         this->data = "";
@@ -29,6 +28,5 @@ void Communication::get_input(Controller &ctrl) {
     if (this->rx_char != '\n'){
         this->data += this->rx_char;
     }
-    Serial.println(this->data);
     return;
 }

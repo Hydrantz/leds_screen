@@ -11,7 +11,7 @@
 class Controller {
 
     enum Buttons : int{
-        all,
+        all = 1,
         up,
         down,
         left,

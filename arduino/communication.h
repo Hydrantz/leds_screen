@@ -6,6 +6,7 @@
 
 class Communication {
   private:
+    char rx_char;
     String data;
     String command;
     String argument;

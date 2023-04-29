@@ -25,8 +25,6 @@ void setup() {
 // ============================
 
 void loop() {
-  if (Serial.available() > 0) {
-    comm.get_input(ctrl);
-  }
+  comm.get_input(ctrl);
   ctrl.fire_effect();
 }

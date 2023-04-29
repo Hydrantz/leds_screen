@@ -7,11 +7,11 @@ Controller Module
 
 from controller import communication as comm
 
-UP = 1
-DOWN = 2
-LEFT = 3
-RIGHT = 4
-ALL = 5
+ALL = 1
+UP = 2
+DOWN = 3
+LEFT = 4
+RIGHT = 5
 
 def transmit_effect(effect_id: int):
     comm.transmit("e"+str(effect_id))

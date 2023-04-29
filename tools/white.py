@@ -8,6 +8,6 @@ LED_NUM = screen_conf.LED_NUM
 GPIO = screen_conf.GPIO
 ORDER = screen_conf.ORDER
 
-pixels = neopixel.NeoPixel(GPIO, LED_NUM, pixel_order=ORDER, auto_write=False)
+pixels = neopixel.NeoPixel(GPIO, LED_NUM, pixel_order=ORDER, auto_write=False, brightness=0.1)
 pixels.fill((255,255,255))
 pixels.show()

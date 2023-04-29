@@ -14,20 +14,25 @@ CLK.direction = digitalio.Direction.OUTPUT
 
 value = ""
 
-def transmit_seven():
+def transmit_seven(string: str):
+    if len(string) < 8:
+            string += " "*(8-len(string))
     while True:
-        new_value = value
-        length = len(new_value)
-        if length < 8:
-            new_value = "X"*(8-length)+new_value
-        for digit in range(8):
-            addup = "1"*(digit)+"0"+"1"*(8-1-digit)
-            digit = new_value[digit]
-            if digit == "X":
-                data = "00000000"
+        value = string
+        for chr in range(8):
+            if value[chr]==".":
+                value = value[:chr]+value[chr+1:]+" "
+            if value[chr]==" ":
+                data = ct.SEVEN_SEGMENT[11][::-1]
             else:
-                data = ct.SEVEN_SEGMENT[int(digit)]
-            data = addup+data
+                data = ct.SEVEN_SEGMENT[int(value[chr])][::-1]
+            if chr < len(value)-1:
+                if value[chr+1] == ".":
+                    data = data[:-1]+"1"
+            digs = "1"*(7-chr)
+            digs += "0"
+            digs += "1"*chr
+            data += digs
             LATCH.value = False
             for seg in data:
                 seg = int(seg)
@@ -38,15 +43,37 @@ def transmit_seven():
                     SER.value = False
                 CLK.value = True
             LATCH.value = True
+            time.sleep(.001)
 
 
 def transmit_sixteen(value: str):
-    data = ct.SIXTEEN_SEGMENT[value]
+    if len(value) < 8:
+        value += " "*(8-len(value))
+    while True:
+        for chr in range(8):
+            data = ct.SIXTEEN_SEGMENT[value[chr]][::-1]
+            digs = "1"*(7-chr)
+            digs += "0"
+            digs += "1"*chr
+            data += digs
+            LATCH.value = False
+            for seg in data:
+                seg = int(seg)
+                CLK.value = False
+                if seg:
+                    SER.value = True
+                else:
+                    SER.value = False
+                CLK.value = True
+            LATCH.value = True
+            time.sleep(.001)
+
+
+def test(value: str):
     LATCH.value = False
-    for seg in data:
-        seg = int(seg)
+    for chr in value:
         CLK.value = False
-        if seg:
+        if chr:
             SER.value = True
         else:
             SER.value = False
@@ -62,5 +89,5 @@ def transmit_sixteen(value: str):
 #     value = str(87654321-int(time.time()-start))
 #     time.sleep(.1)
 
-while True:
-    transmit_sixteen(input())
+# while True:
+#     transmit_sixteen(input())

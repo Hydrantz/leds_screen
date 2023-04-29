@@ -6,8 +6,6 @@ sys.path.append(dirname(dirname(abspath(__file__))))
 
 from leds_screen.screen import screen_configuration as screen_conf
 
-from leds_screen.screen import screen_configuration as screen_conf
-
 mode = None
 if len(sys.argv)>1:
     mode = sys.argv[1]
@@ -19,7 +17,8 @@ else:
 GPIO = screen_conf.GPIO
 ORDER = screen_conf.ORDER
 
-pixels = neopixel.NeoPixel(GPIO, LED_NUM, pixel_order=ORDER, auto_write=False)
+
+pixels = neopixel.NeoPixel(GPIO, LED_NUM, pixel_order=ORDER, auto_write=False, brightness=0.1)
 
 def get_rainbow_hue(part, whole):
     points = int(1530/whole*part)

@@ -11,24 +11,9 @@ class Communication {
     String argument;
 
   public:
-    Communication(){
-      data = "";
-      command = "";
-      argument = "";
-    }
+    Communication();
 
-    void get_input(Controller &ctrl) {
-      data = Serial.readStringUntil('@');
-      command = data[0];
-      argument = data.substring(1);
-      if (command == "a") {
-        ctrl.update_buttons(argument.toInt());
-      }
-      else if (command == "e") {
-        ctrl.update_effect(argument.toInt());
-      }
-      return;
-    }
+    void get_input(Controller &ctrl);
 
   };
 

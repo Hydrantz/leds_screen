@@ -14,10 +14,10 @@ from screen import screen_configuration as screen_conf
 pixels = neopixel.NeoPixel(screen_conf.GPIO, screen_conf.LED_NUM, pixel_order=screen_conf.ORDER, auto_write=False)
 
 # pre-defined colors using RGB values
-WHITE = pixels._parse_color((150,150,150))
-BLUE = pixels._parse_color((0,0,255))
-RED = pixels._parse_color((255,0,0))
-GREEN = pixels._parse_color((0,255,0))
+WHITE = pixels._parse_color((25,25,25))
+BLUE = pixels._parse_color((0,0,75))
+RED = pixels._parse_color((75,0,0))
+GREEN = pixels._parse_color((0,75,0))
 EMPTY = pixels._parse_color((0,0,0))
 
 

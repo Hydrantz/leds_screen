@@ -64,6 +64,7 @@ class Controller {
         void set_buns_leds(Color color); // sets color of all buttons leds
         void set_buns_leds_default(); // sets color of all buttons leds to default color
         void set_all_leds(Color color); // sets color of every single led
+        void set_sel(bool sel_active); // sets color of every single led
         void fire_effect(); // runs a step of current effect
         void update_effect(Effect new_effect);
         void update_buttons(Buttons direction); // updates buttons lighting

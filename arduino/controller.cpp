@@ -20,7 +20,7 @@ Controller::Controller(
     this->current_effect = 1;
     this->current_direction = BUTTON_ERROR;
     this->button_color = {24, 84, 128};
-    this->sel_bun_enabled = true;
+    this->sel_bun_enabled = false;
 }
 
 // Led Strip Control Functions
@@ -60,10 +60,23 @@ void Controller::set_all_leds(Color color) {
     set_multi_leds(color, 0, strip_length);
 }
 
+void Controller::set_sel(bool sel_active){
+    if (sel_active == true){
+        this->sel_bun_enabled = true;
+    }
+    if (sel_active == false){
+        this->sel_bun_enabled = false;
+    }
+}
+
 void Controller::update_buttons(Buttons direction) {
     if (direction >= BUTTON_ERROR){
         return;
     }
+    if (direction == 0){
+        return;
+    }
+    
     if (direction == this->current_direction){
         return;
     }
@@ -94,6 +107,9 @@ void Controller::update_buttons(Buttons direction) {
 
 void Controller::update_effect(Effect new_effect) {
     if (new_effect >= EFFECT_ERROR){
+        return;
+    }
+    if (new_effect == 0){
         return;
     }
     this->current_effect = new_effect;

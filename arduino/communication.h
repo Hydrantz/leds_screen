@@ -8,13 +8,14 @@ class Communication {
   private:
     char rx_char;
     String data;
-    String command;
+    char command;
     String argument;
 
   public:
     Communication();
 
     void get_input(Controller &ctrl);
+    void use_input(Controller &ctrl);
 
   };
 

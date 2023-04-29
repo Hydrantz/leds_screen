@@ -17,16 +17,25 @@ void Communication::get_input(Controller &ctrl) {
         this->command = this->data[0];
         this->argument = this->data.substring(1);
         this->data = "";
-        if (this->command == "a") {
-            ctrl.update_buttons(this->argument.toInt());
-        }
-        else if (this->command == "e") {
-            ctrl.update_effect(this->argument.toInt());
-        }
+        this->use_input(ctrl);
         return;
     }
     if (this->rx_char != '\n'){
         this->data += this->rx_char;
     }
     return;
+}
+
+void Communication::use_input(Controller &ctrl){
+    switch (this->command) {
+    case 'a':
+        ctrl.update_buttons(this->argument.toInt());
+        break;
+    case 'e':
+        ctrl.update_effect(this->argument.toInt());
+        break;
+    case 's':
+        ctrl.set_sel(this->argument.toInt());
+        break;
+    }
 }

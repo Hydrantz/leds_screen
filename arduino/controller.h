@@ -3,12 +3,12 @@
 
 #include "Arduino.h"
 #include <Adafruit_NeoPixel.h>
-class Controller {
     struct Color {
         int r;
         int g;
         int b;
     };
+class Controller {
 
     enum Buttons : int{
         all,
@@ -49,47 +49,35 @@ class Controller {
         Controller& operator=(Controller&) = delete;
         const Controller& operator=(const Controller&) = delete;
 
-        // Led Strip Control Functions
+        // Led Strip Utility Functions
         // ===========================
 
         void showStrip(); // updates led strip
         void showEffect(); // updates led strip only if effects are not overriden
         void setPixel(  int Pixel,
-                        byte red,
-                        byte green,
-                        byte blue); // sets color of a single pixel
-        void set_multi_leds(byte red,
-                            byte green,
-                            byte blue,
+                        Color color); // sets color of a single pixel
+        void set_multi_leds(Color color,
                             int start,
                             int end); // sets color of a pixels range
         void turnoff_two_leds(int i, int j);
-        void set_effect_leds(   byte red,
-                                byte green,
-                                byte blue); // sets color of all effect leds
-        void set_buns_leds( byte red,
-                            byte green,
-                            byte blue); // sets color of all buttons leds
+        void set_effect_leds(Color color); // sets color of all effect leds
+        void set_buns_leds(Color color); // sets color of all buttons leds
         void set_buns_leds_default(); // sets color of all buttons leds to default color
-        void set_all_leds(  byte red,
-                            byte green,
-                            byte blue); // sets color of every single led
+        void set_all_leds(Color color); // sets color of every single led
         void fire_effect(); // runs a step of current effect
-        void update_effect(int new_effect);
+        void update_effect(Effect new_effect);
         void update_buttons(Buttons direction); // updates buttons lighting
 
         // Effects Helper Functions
         // ========================
 
-        void CylonBounce(   byte red,
-                            byte green,
-                            byte blue,
+        void CylonBounce(   Color color,
                             int EyeSize,
                             int SpeedDelay,
                             int ReturnDelay );
-        void mono_color_cycle(byte red, byte green, byte blue);
-        void strobe(byte red, byte green, byte blue, int FlashDelay);
-        void mono_color(byte red, byte green, byte blue);
+        void mono_color_cycle(Color color);
+        void strobe(Color color, int FlashDelay);
+        void mono_color(Color color);
 
         // Effects
         // ========================

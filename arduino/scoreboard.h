@@ -18,7 +18,7 @@ enum class Character : int{
     A, B, C, D, E, F, G, H, I, J,
     K, L, M, N, O, P, Q, R, S, T,
     U, V, W, X, Y, Z, dollar, percent,
-    ampersand, star, hashtag, blank,
+    ampersand, star, all, blank,
 
     ERROR
 };
@@ -26,10 +26,10 @@ enum class Character : int{
 class Scoreboard {
 
   private:
-    int clk;
-    int latch;
-    int seven;
-    int sixteen;
+    int clk_pin;
+    int latch_pin;
+    int seven_pin;
+    int sixteen_pin;
     int transmitting_step;
     int current_digit;
     String seven_segment_text;
@@ -43,6 +43,8 @@ class Scoreboard {
     const Scoreboard& operator=(const Scoreboard&) = delete;
 
     void transmit_score();
+
+    void clock_signals(bool bit_seven, bool bit_sixteen);
 
     void transmit_character(int pin, bool is_high);
 

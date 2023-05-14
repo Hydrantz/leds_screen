@@ -14,24 +14,56 @@ byte seven_segment_map[10][8] = {
   {1,1,1,1,0,1,1,0}, //9
 };
 
-byte sixteen_segment_map[10][16] = {
-  {1,1,1,1,1,1,0,0},//0
-  {0,1,1,0,0,0,0,0},//1
-  {1,1,0,1,1,0,1,0},//2
-  {1,1,1,1,0,0,1,0},//3
-  {0,1,1,0,0,1,1,0},//4
-  {1,0,1,1,0,1,1,0},//5
-  {1,0,1,1,1,1,1,0},//6
-  {1,1,1,0,0,0,0,0},//7
-  {1,1,1,1,1,1,1,0},//8
-  {1,1,1,1,0,1,1,0}, //9
+byte sixteen_segment_map[42][16] = {
+  {1,1,1,1,1,1,1,1,0,0,0,0,1,0,0,1},
+  {0,0,1,1,0,0,0,0,0,0,0,0,1,0,0,0},
+  {1,1,1,0,1,1,1,0,1,1,0,0,0,0,0,0},
+  {1,1,1,1,1,1,0,0,1,1,0,0,0,0,0,0},
+  {0,0,1,1,0,0,0,1,1,1,0,0,0,0,0,0},
+  {1,1,0,1,1,1,0,1,1,1,0,0,0,0,0,0},
+  {1,1,0,1,1,1,1,1,1,1,0,0,0,0,0,0},
+  {1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0},
+  {1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0},
+  {1,1,1,1,1,1,0,1,1,1,0,0,0,0,0,0},
+  {1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0},
+  {1,1,1,1,1,1,0,0,0,1,0,1,0,0,1,0},
+  {1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0},
+  {1,1,1,1,1,1,0,0,0,0,0,1,0,0,1,0},
+  {1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,0},
+  {1,1,0,0,0,0,1,1,1,0,0,0,0,0,0,0},
+  {1,1,0,1,1,1,1,1,0,1,0,0,0,0,0,0},
+  {0,0,1,1,0,0,1,1,1,1,0,0,0,0,0,0},
+  {1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0},
+  {0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,1,1,1,0,0,0,1,1,0,0},
+  {0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0},
+  {0,0,1,1,0,0,1,1,0,0,1,0,1,0,0,0},
+  {0,0,1,1,0,0,1,1,0,0,1,0,0,1,0,0},
+  {1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0},
+  {1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,0},
+  {1,1,1,1,1,1,1,1,0,0,0,0,0,1,0,0},
+  {1,1,1,0,0,0,1,1,1,1,0,0,0,1,0,0},
+  {1,1,0,1,1,1,0,1,1,1,0,0,0,0,0,0},
+  {1,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0},
+  {0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1},
+  {0,0,1,1,0,0,1,1,0,0,0,0,0,1,0,1},
+  {0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,1},
+  {0,0,1,1,1,1,0,1,1,1,0,0,0,0,0,0},
+  {1,1,0,0,1,1,0,0,0,0,0,0,1,0,0,1},
+  {1,1,0,1,1,1,0,1,1,1,0,1,0,0,1,0},
+  {1,0,0,1,0,1,0,1,1,1,0,1,1,0,1,1},
+  {1,0,0,0,1,1,1,0,1,0,1,1,0,1,0,0},
+  {0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1},
+  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+  {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 };
 
 Scoreboard::Scoreboard(int clk, int latch, int seven, int sixteen){
-  this->clk = clk;
-  this->latch = latch;
-  this->seven = seven;
-  this->sixteen = sixteen;
+  this->clk_pin = clk;
+  this->latch_pin = latch;
+  this->seven_pin = seven;
+  this->sixteen_pin = sixteen;
   this->transmitting_step = 0;
   this->current_digit = 0;
   this->seven_segment_text = "12345678";
@@ -40,19 +72,24 @@ Scoreboard::Scoreboard(int clk, int latch, int seven, int sixteen){
 
 void Scoreboard::transmit_score(){
   if (this->transmitting_step == 0){
-    digitalWrite(this->latch, LOW);
+    digitalWrite(this->latch_pin, LOW);
   }
-  if (this->transmitting_step < 8){
-    int bit = this->get_current_bit(true);
-    this->transmit_character(this->seven, bit);
+  if (this->transmitting_step < 16){
+    bool bit_seven = false;
+    if (this->transmitting_step >= 8){
+      bit_seven = this->get_current_bit(true);
+    }
+    bool bit_sixteen = this->get_current_bit(false);
+    this->transmit_character(bit_seven, bit_sixteen);
     this->transmitting_step += 1;
   }
-  else if (this->transmitting_step < 16){
-    this->transmit_character(this->seven, this->transmitting_step != 15 - this->current_digit);
+  else if (this->transmitting_step < 24){
+    bool bit_digit = (this->transmitting_step != 23 - this->current_digit);
+    this->clock_signals(bit_digit, bit_digit);
     this->transmitting_step += 1;
   }
   else {
-    digitalWrite(this->latch, HIGH);
+    digitalWrite(this->latch_pin, HIGH);
     this->transmitting_step = 0;
     if (this->current_digit < 7){
       this->current_digit += 1;
@@ -63,15 +100,20 @@ void Scoreboard::transmit_score(){
   }
 }
 
-void Scoreboard::transmit_character(int pin, bool is_high){
-  digitalWrite(this->clk, LOW);
-    if (is_high){
-      digitalWrite(pin, HIGH);
-    }
-    else{
-      digitalWrite(pin, LOW);
-    }
-  digitalWrite(this->clk, HIGH);
+void Scoreboard::clock_signals(bool bit_seven, bool bit_sixteen){
+  digitalWrite(this->clk_pin, LOW);
+  this->transmit_character(this->seven_pin, bit_seven);
+  this->transmit_character(this->sixteen_pin, bit_sixteen);
+  digitalWrite(this->clk_pin, HIGH);
+}
+
+void Scoreboard::transmit_character(int pin, bool bit){
+  if (bit){
+    digitalWrite(pin, HIGH);
+  }
+  else{
+    digitalWrite(pin, LOW);
+  }
 }
 
 int Scoreboard::char_to_index(char chr){
@@ -94,7 +136,7 @@ int Scoreboard::char_to_index(char chr){
   case '*':
     return int(Character::star);
   case '#':
-    return int(Character::hashtag);
+    return int(Character::all);
   }
 }
 
@@ -109,7 +151,7 @@ int Scoreboard::get_current_bit(bool is_seven_segment){
   int current_char_index = this->char_to_index(current_char);
   int bit;
   if (is_seven_segment){
-    bit = seven_segment_map[current_char_index][this->transmitting_step];
+    bit = seven_segment_map[current_char_index][this->transmitting_step-8];
   }
   else{
     bit = sixteen_segment_map[current_char_index][this->transmitting_step];

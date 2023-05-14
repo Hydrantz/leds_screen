@@ -121,7 +121,7 @@ int Scoreboard::char_to_index(char chr){
     return chr - '0';
   }
   if (chr >= 'A' && chr <= 'Z'){
-    return chr - 'A' + 10;
+    return chr - 'A' + (int)Character::A;
   }
   switch (chr)
   {

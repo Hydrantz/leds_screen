@@ -43,7 +43,7 @@ class Controller {
         bool sel_bun_enabled;
 
     public:
-        Controller(Adafruit_NeoPixel* led_strip,int strip_length,int bun_led_length);
+        Controller(Adafruit_NeoPixel* led_strip, int strip_length, int bun_led_length);
         Controller(Controller&) = delete;
         Controller(const Controller&) = delete;
         Controller& operator=(Controller&) = delete;

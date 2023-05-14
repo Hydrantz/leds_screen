@@ -13,6 +13,10 @@ class Communication {
 
   public:
     Communication();
+    Communication(Communication&) = delete;
+    Communication(const Communication&) = delete;
+    Communication& operator=(Communication&) = delete;
+    const Communication& operator=(const Communication&) = delete;
 
     void get_input(Controller &ctrl);
     void use_input(Controller &ctrl);

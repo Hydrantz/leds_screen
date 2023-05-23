@@ -17,7 +17,7 @@ Controller::Controller(
     this->effect_last_time = 0;
     this->effect_step = 0;
     this->lighting_override = false;
-    this->current_effect = 1;
+    this->current_effect = Effect::effect_blue;
     this->current_direction = BUTTON_ERROR;
     this->button_color = {24, 84, 128};
     this->sel_bun_enabled = false;
@@ -106,31 +106,32 @@ void Controller::update_buttons(Buttons direction) {
 }
 
 void Controller::update_effect(Effect new_effect) {
-    if (new_effect >= EFFECT_ERROR){
+    if (new_effect >= Effect::EFFECT_ERROR){
         return;
     }
-    if (new_effect == 0){
+    if (new_effect == this->current_effect){
         return;
     }
     this->current_effect = new_effect;
+    this->effect_step = 0;
     return;
 }
 
 void Controller::fire_effect(){
     switch (this->current_effect) {
-        case effect_blank:
+        case Effect::effect_blank:
             this->blank();
             break;
-        case effect_blue:
+        case Effect::effect_blue:
             this->blue();
             break;
-        case effect_yellow:
+        case Effect::effect_yellow:
             this->yellow();
             break;
-        case effect_cylon:
+        case Effect::effect_cylon:
             this->red_cylon();
             break;
-        case effect_strobe:
+        case Effect::effect_strobe:
             this->white_strobe();
             break;
     }
@@ -211,6 +212,9 @@ void Controller::strobe(Color color, int FlashDelay){
 
 void Controller::mono_color(Color color) {
 
+    if (this->effect_step >= 1){
+        return;
+    }
     int delay = 100; // Delay time between steps in milliseconds
     int cur_time = millis();
     // Manage Delay
@@ -218,7 +222,7 @@ void Controller::mono_color(Color color) {
         return;
     }
     effect_last_time = cur_time;
-    effect_step = 0;
+    effect_step = 1;
     set_effect_leds(color);
     showEffect(); // This sends the updated pixel color to the hardware.
 

@@ -37,7 +37,7 @@ class Controller {
         bool lighting_override;
         int effect_last_time;
         int effect_step;
-        int current_effect;
+        Effect current_effect;
         Buttons current_direction;
         Color button_color;
         bool sel_bun_enabled;

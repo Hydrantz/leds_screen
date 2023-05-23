@@ -66,8 +66,8 @@ Scoreboard::Scoreboard(int clk, int latch, int seven, int sixteen){
   this->sixteen_pin = sixteen;
   this->transmitting_step = 0;
   this->current_digit = 0;
-  this->seven_segment_text = "12345678";
-  this->sixteen_segment_text = "12345678";
+  this->seven_segment_text = "        ";
+  this->sixteen_segment_text = "        ";
 }
 
 void Scoreboard::transmit_score(){
@@ -80,7 +80,7 @@ void Scoreboard::transmit_score(){
       bit_seven = this->get_current_bit(true);
     }
     bool bit_sixteen = this->get_current_bit(false);
-    this->transmit_character(bit_seven, bit_sixteen);
+    this->clock_signals(bit_seven, bit_sixteen);
     this->transmitting_step += 1;
   }
   else if (this->transmitting_step < 24){
@@ -88,7 +88,7 @@ void Scoreboard::transmit_score(){
     this->clock_signals(bit_digit, bit_digit);
     this->transmitting_step += 1;
   }
-  else {
+  if (this->transmitting_step >= 24) {
     digitalWrite(this->latch_pin, HIGH);
     this->transmitting_step = 0;
     if (this->current_digit < 7){
@@ -101,6 +101,10 @@ void Scoreboard::transmit_score(){
 }
 
 void Scoreboard::clock_signals(bool bit_seven, bool bit_sixteen){
+  // Serial.print(this->transmitting_step);
+  // Serial.print(" ");
+  // Serial.print(bit_sixteen);
+  // Serial.println();
   digitalWrite(this->clk_pin, LOW);
   this->transmit_character(this->seven_pin, bit_seven);
   this->transmit_character(this->sixteen_pin, bit_sixteen);
@@ -140,7 +144,7 @@ int Scoreboard::char_to_index(char chr){
   }
 }
 
-int Scoreboard::get_current_bit(bool is_seven_segment){
+bool Scoreboard::get_current_bit(bool is_seven_segment){
   char current_char;
   if (is_seven_segment){
     current_char = this->seven_segment_text[this->current_digit];

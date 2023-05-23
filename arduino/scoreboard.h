@@ -44,13 +44,15 @@ class Scoreboard {
 
     void transmit_score();
 
+    void transmit_sixteen();
+
     void clock_signals(bool bit_seven, bool bit_sixteen);
 
     void transmit_character(int pin, bool is_high);
 
     int char_to_index(char chr);
 
-    int get_current_bit(bool is_seven_segment);
+    bool get_current_bit(bool is_seven_segment);
   };
 
 #endif

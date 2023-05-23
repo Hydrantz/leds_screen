@@ -40,5 +40,7 @@ void setup() {
 void loop() {
   comm.get_input(ctrl);
   ctrl.fire_effect();
-  score.transmit_score();
+  for (int i = 0 ; i < 50; i++){
+    score.transmit_score();
+  }
 }

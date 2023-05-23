@@ -101,10 +101,6 @@ void Scoreboard::transmit_score(){
 }
 
 void Scoreboard::clock_signals(bool bit_seven, bool bit_sixteen){
-  // Serial.print(this->transmitting_step);
-  // Serial.print(" ");
-  // Serial.print(bit_sixteen);
-  // Serial.println();
   digitalWrite(this->clk_pin, LOW);
   this->transmit_character(this->seven_pin, bit_seven);
   this->transmit_character(this->sixteen_pin, bit_sixteen);
@@ -129,19 +125,18 @@ int Scoreboard::char_to_index(char chr){
   }
   switch (chr)
   {
-  case ' ':
-    return int(Character::blank);
-  case '$':
-    return int(Character::dollar);
-  case '%':
-    return int(Character::percent);
-  case '&':
-    return int(Character::ampersand);
-  case '*':
-    return int(Character::star);
-  case '#':
-    return int(Character::all);
-  }
+    case '$':
+      return int(Character::dollar);
+    case '%':
+      return int(Character::percent);
+    case '&':
+      return int(Character::ampersand);
+    case '*':
+      return int(Character::star);
+    case '#':
+      return int(Character::all);
+    }
+  return int(Character::blank);
 }
 
 bool Scoreboard::get_current_bit(bool is_seven_segment){
@@ -161,4 +156,13 @@ bool Scoreboard::get_current_bit(bool is_seven_segment){
     bit = sixteen_segment_map[current_char_index][this->transmitting_step];
   }
   return bit;
+}
+
+
+void Scoreboard::set_segment_text(bool is_seven_segment, String new_text){
+  if (is_seven_segment){
+    this->seven_segment_text = new_text;
+    return;
+  }
+  this->sixteen_segment_text = new_text;
 }

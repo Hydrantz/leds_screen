@@ -53,6 +53,8 @@ class Scoreboard {
     int char_to_index(char chr);
 
     bool get_current_bit(bool is_seven_segment);
+
+    void set_segment_text(bool is_seven_segment, String new_text);
   };
 
 #endif

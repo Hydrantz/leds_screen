@@ -17,7 +17,7 @@ Controller::Controller(
     this->effect_last_time = 0;
     this->effect_step = 0;
     this->lighting_override = false;
-    this->current_effect = Effect::effect_blue;
+    this->current_effect = Effect::effect_blank;
     this->current_direction = BUTTON_ERROR;
     this->button_color = {24, 84, 128};
     this->sel_bun_enabled = false;

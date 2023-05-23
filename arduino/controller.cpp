@@ -106,7 +106,7 @@ void Controller::update_buttons(Buttons direction) {
 }
 
 void Controller::update_effect(Effect new_effect) {
-    if (new_effect >= Effect::EFFECT_ERROR){
+    if (new_effect >= Effect::EFFECT_ERROR || new_effect <= Effect::zero){
         return;
     }
     if (new_effect == this->current_effect){

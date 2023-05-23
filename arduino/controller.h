@@ -21,7 +21,8 @@ class Controller {
     };
 
     enum Effect : int {
-        effect_blank = 1,
+        zero,
+        effect_blank,
         effect_blue,
         effect_yellow,
         effect_cylon,

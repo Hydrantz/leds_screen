@@ -1,4 +1,5 @@
 #include "communication.h"
+#include "scoreboard.h"
 #include "Arduino.h"
 
 Communication::Communication(){
@@ -8,7 +9,7 @@ Communication::Communication(){
     this->argument = "";
 }
 
-void Communication::get_input(Controller &ctrl) {
+void Communication::get_input(Controller &ctrl, Scoreboard &score) {
     if (Serial.available() <= 0) {
         return;
     }    
@@ -17,7 +18,7 @@ void Communication::get_input(Controller &ctrl) {
         this->command = this->data[0];
         this->argument = this->data.substring(1);
         this->data = "";
-        this->use_input(ctrl);
+        this->use_input(ctrl, score);
         return;
     }
     if (this->rx_char != '\n'){
@@ -26,7 +27,7 @@ void Communication::get_input(Controller &ctrl) {
     return;
 }
 
-void Communication::use_input(Controller &ctrl){
+void Communication::use_input(Controller &ctrl, Scoreboard &score){
     switch (this->command) {
     case 'a':
         ctrl.update_buttons(this->argument.toInt());
@@ -34,8 +35,14 @@ void Communication::use_input(Controller &ctrl){
     case 'e':
         ctrl.update_effect(this->argument.toInt());
         break;
-    case 's':
+    case 'o':
         ctrl.set_sel(this->argument.toInt());
+        break;
+    case 's':
+        score.set_segment_text(true, this->argument);
+        break;
+    case 't':
+        score.set_segment_text(false, this->argument);
         break;
     }
 }

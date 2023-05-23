@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "controller.h"
+#include "scoreboard.h"
 
 class Communication {
   private:
@@ -18,8 +19,8 @@ class Communication {
     Communication& operator=(Communication&) = delete;
     const Communication& operator=(const Communication&) = delete;
 
-    void get_input(Controller &ctrl);
-    void use_input(Controller &ctrl);
+    void get_input(Controller &ctrl, Scoreboard &score);
+    void use_input(Controller &ctrl, Scoreboard &score);
 
   };
 

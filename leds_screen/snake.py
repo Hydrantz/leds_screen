@@ -1,70 +1,82 @@
 from time import sleep
 import random, sys
 from os.path import dirname, abspath
-sys.path.append(dirname(dirname(abspath(__file__))))
 from screen import graphics, screen_configuration as screen_conf
 from controller import buttons, lighting as controller_lights, communication as comm
+sys.path.append(dirname(dirname(abspath(__file__))))
 
+# set screen dimensions according to global screen properties
 HEIGHT = screen_conf.HEIGHT
 WIDTH = screen_conf.WIDTH
 
+# check which game controller is used
 CONTROL_MODE = None
 if len(sys.argv) > 1:
-    CONTROL_MODE = sys.argv[1]
+    CONTROL_MODE = sys.argv[1] # assign control mode if given as command line argument
 if CONTROL_MODE == "keyboard":
-    import keyboard
-
-EMPTY_BOARD = [[graphics.EMPTY for y in range(HEIGHT)] for x in range(WIDTH)]
+    import keyboard # if keyboard is selected, import library accordingly
 
 class Snake():
-
-    ABS_SPEED = 1
+    # An object representing the snake
 
     def __init__(self):
-        self.snake_x = int(WIDTH/2)
-        self.snake_y = int(HEIGHT/2)
-        self.snake_speeds = (0, 0)
-        self.snake_length = 4
-        self.snake_offsets = []
+        self.snake_x = int(WIDTH/2) # snake's X coordinate: starts at the middle of screen
+        self.snake_y = int(HEIGHT/2) # snake's Y coordinate: starts at the middle of screen
+        self.snake_speeds = (0, 0) # snake's speed vector: (X,Y). starts still
+        self.snake_length = 4 # amount of nodes contained in the snake: starts at 4
+
+        self.snake_nodes_offsets = []   # array of length snake_length-1. each element
+                                        # represents a node in the snake, starting from
+                                        # the second node. the value of each element is
+                                        # a tuple containing the position of it's node
+                                        # relative to the previous node
+
+        self.last_node = None   # a tuple containing coordinates for the the last
+                                # node in the snake (updated to previous game frame).
+                                # since the graphics are not necessarily reset in
+                                # each game frame, this is used to manually delete
+                                # that node from screen
         
-        for chain in range(self.snake_length-1+Snake.ABS_SPEED):
-            self.snake_offsets.append((1, 0))
+        # this creates initial snake_nodes_offsets. the snake is initially oriented
+        # to the left.
+        for chain in range(self.snake_length-1):
+            self.snake_nodes_offsets.append((1, 0))
 
         self.draw_snake()
-        self.snake_offsets = self.snake_offsets[:-Snake.ABS_SPEED]
 
     def draw_snake(self):
         cur_coords = (self.snake_x, self.snake_y)
         coords = cur_coords
-        for chain in range(len(self.snake_offsets)-Snake.ABS_SPEED):
-            coords = coords[0] + self.snake_offsets[chain][0], coords[1] + self.snake_offsets[chain][1]
+        if self.last_node:
+            graphics.draw_pixel(graphics.coords2led_index(*self.last_node), *graphics.EMPTY)
+        for chain in range(len(self.snake_nodes_offsets)):
+            coords = coords[0] + self.snake_nodes_offsets[chain][0], coords[1] + self.snake_nodes_offsets[chain][1]
             graphics.draw_pixel(graphics.coords2led_index(*coords), *graphics.WHITE)
-        for i in range(Snake.ABS_SPEED):
-            coords = coords[0] + self.snake_offsets[-i-1][0], coords[1] + self.snake_offsets[-i-1][1]
-            graphics.draw_pixel(graphics.coords2led_index(*coords), *graphics.EMPTY)
-        graphics.draw_pixel(graphics.coords2led_index(*cur_coords), *graphics.RED)
+            if chain == self.snake_length-2:
+                self.last_node = coords
+        graphics.draw_pixel(graphics.coords2led_index(self.snake_x, self.snake_y), *graphics.RED)
         graphics.update_screen()
 
     def move_snake(self):
-        self.snake_x += Snake.ABS_SPEED*self.snake_speeds[0]
-        self.snake_y += Snake.ABS_SPEED*self.snake_speeds[1]
+        self.snake_x += 1*self.snake_speeds[0]
+        self.snake_y += 1*self.snake_speeds[1]
         if self.snake_x >= WIDTH or self.snake_x <= 1:
             return False
         if self.snake_y >= HEIGHT-1 or self.snake_y <= 0:
             return False
         
-        for i in range(Snake.ABS_SPEED):
-            self.snake_offsets.insert(0,(-self.snake_speeds[0], -self.snake_speeds[1]))
+        for i in range(1):
+            self.snake_nodes_offsets.insert(0,(-self.snake_speeds[0], -self.snake_speeds[1]))
+        self.snake_nodes_offsets = self.snake_nodes_offsets[:-1]
         self.draw_snake()
-        self.snake_offsets = self.snake_offsets[:-Snake.ABS_SPEED]
         return True
 
     def enlarge_snake(self):
-        self.snake_length += Snake.ABS_SPEED
+        self.snake_length += 1
         x_offset = self.snake_speeds[0]*-1
         y_offset = self.snake_speeds[1]*-1
-        for i in range(Snake.ABS_SPEED):
-            self.snake_offsets.append((x_offset, y_offset))
+        for i in range(1):
+            self.snake_nodes_offsets.append((x_offset, y_offset))
 
 if CONTROL_MODE == "keyboard":
     def handle_input(prev_speeds):
@@ -95,7 +107,7 @@ else:
             pass
         return new_speeds
 
-def process_input(snake: Snake, prev_speeds):
+def process_input(prev_speeds):
     new_speeds = handle_input(prev_speeds)
 
     if (prev_speeds != (-1)*new_speeds[0] and
@@ -113,7 +125,7 @@ def manage_apples(isApple, appleCoords, snake: Snake):
         
         if appleX == snakeX or appleY == snakeY:
             continue
-        snake_offset = snake.snake_offsets
+        snake_offset = snake.snake_nodes_offsets
         for chain in snake_offset:
             snakeX += chain[0]
             snakeY += chain[1]
@@ -154,10 +166,10 @@ def play():
     else:
         buttons.wait_for("left")
     controller_lights.blue()
-    process_input(snake, initial_speed)
+    process_input(initial_speed)
     while run:
         color_frame()
-        speeds = process_input(snake, snake.snake_speeds)
+        speeds = process_input(snake.snake_speeds)
         snake.snake_speeds = speeds
         isApple, appleCoords = manage_apples(isApple, appleCoords, snake)
 

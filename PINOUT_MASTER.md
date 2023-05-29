@@ -1,4 +1,4 @@
-# GPIO PINOUT
+# MASTER PINOUT
 |  |  |
 |:-:|:-:|
 |3v3    |5v     |
@@ -20,4 +20,4 @@
 |GPIO 13|GND    |
 |GPIO 19|GPIO 16|
 |GPIO 26|GPIO 20|
-|GND    |GPIO 21|
+|GND    |GPIO 21 <br> **SCREEN LED SIGNAL**|

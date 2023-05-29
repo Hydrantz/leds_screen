@@ -7,4 +7,5 @@ A python library designed to run games on a screen made out of [WS2812B](https:/
  - [keyboard](https://github.com/boppreh/keyboard) (only for keyboard mode)
 
  ## Hardware
- [GPIO PINOUT](PINOUT.md)
+- [MASTER PINOUT](PINOUT_MASTER.md)
+- [SLAVE PINOUT](PINOUT_SLAVE.md)

@@ -5,7 +5,8 @@
 
 
 enum class Character : int{
-    zero = 0,
+    blank = 0,
+    zero,
     one,
     two,
     three,
@@ -18,7 +19,7 @@ enum class Character : int{
     A, B, C, D, E, F, G, H, I, J,
     K, L, M, N, O, P, Q, R, S, T,
     U, V, W, X, Y, Z, dollar, percent,
-    ampersand, star, all, blank,
+    ampersand, star, all,
 
     ERROR
 };

@@ -1,7 +1,8 @@
 #include "scoreboard.h"
 #include "Arduino.h"
 
-byte seven_segment_map[10][8] = {
+byte seven_segment_map[11][8] = {
+  {0,0,0,0,0,0,0,0}, // blank
   {1,1,1,1,1,1,0,0},//0
   {0,1,1,0,0,0,0,0},//1
   {1,1,0,1,1,0,1,0},//2
@@ -15,6 +16,7 @@ byte seven_segment_map[10][8] = {
 };
 
 byte sixteen_segment_map[42][16] = {
+  {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
   {1,1,1,1,1,1,1,1,0,0,0,0,1,0,0,1},
   {0,0,1,1,0,0,0,0,0,0,0,0,1,0,0,0},
   {1,1,1,0,1,1,1,0,1,1,0,0,0,0,0,0},
@@ -56,7 +58,6 @@ byte sixteen_segment_map[42][16] = {
   {1,0,0,0,1,1,1,0,1,0,1,1,0,1,0,0},
   {0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1},
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-  {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 };
 
 Scoreboard::Scoreboard(int clk, int latch, int seven, int sixteen){
@@ -118,7 +119,7 @@ void Scoreboard::transmit_character(int pin, bool bit){
 
 int Scoreboard::char_to_index(char chr){
   if (chr >= '0' && chr <= '9'){
-    return chr - '0';
+    return chr - '0' + int(Character::zero);
   }
   if (chr >= 'A' && chr <= 'Z'){
     return chr - 'A' + (int)Character::A;

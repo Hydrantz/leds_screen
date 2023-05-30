@@ -1,3 +1,11 @@
+"""
+Communication Module
+----
+- manages serial communication between Raspberry Pi and Arduino.
+- sends control commands for controller buttons, controller lights and scoreboard
+---
+"""
+
 import board
 import digitalio
 import time

@@ -43,6 +43,7 @@ class Snake():
 
         self.draw_snake() # draw snake for the first time
 
+
     def draw_snake(self):
         """draws snake's current state to screen"""
         cur_coords = (self.snake_x, self.snake_y)
@@ -64,8 +65,9 @@ class Snake():
         graphics.draw_pixel(graphics.coords2led_index(self.snake_x, self.snake_y), *graphics.RED)
         graphics.update_screen() # send new data to screen
 
+
     def move_snake(self) -> bool:
-        """this function moves the snake according to its current speed
+        """this method moves the snake according to its current speed
 
         Returns:
             bool:   True - snake can move successfully
@@ -82,20 +84,43 @@ class Snake():
         if self.snake_y >= HEIGHT-1 or self.snake_y <= 0:
             return False
 
+        # the following lines adds the relevant offset to the top of snake_nodes_offsets.
+        # also removes the bottom element since that pixel has moved.
         self.snake_nodes_offsets.insert(0,(-self.snake_speeds[0], -self.snake_speeds[1]))
         self.snake_nodes_offsets = self.snake_nodes_offsets[:-1]
-        self.draw_snake()
+
+        self.draw_snake() # draw the moved snake to screen
         return True
 
+
     def enlarge_snake(self):
+        """
+        this method increases the snake's length by 1
+        """
         self.snake_length += 1
+        # these next lines calculates the offset of the new node
         x_offset = self.snake_speeds[0]*-1
         y_offset = self.snake_speeds[1]*-1
+        # and adds them at the bottom of snake_nodes_offsets
         self.snake_nodes_offsets.append((x_offset, y_offset))
 
+    # define different version of the method fir different control
+    # methods
+
 if CONTROL_MODE == "keyboard":
-    def handle_input(prev_speeds):
+    def handle_input(prev_speeds) -> tuple[int, int]:
+        """
+        Handle player input and figure out which buttons were pressed
+
+        Args:
+            prev_speeds (int, int): snake's previous speed vector
+
+        Returns:
+            (int, int): new speed vector
+        """
         new_speeds = prev_speeds
+        # for each keyboard arrow, check if it is pressed and
+        # set the speed vector accordingly
         if keyboard.is_pressed("up"):
             new_speeds = (-1, 0)
         elif keyboard.is_pressed("down"):
@@ -106,9 +131,21 @@ if CONTROL_MODE == "keyboard":
             new_speeds = (0, -1)
         return new_speeds
 else:
-    def handle_input(prev_speeds):
+
+    def handle_input(prev_speeds) -> tuple[int, int]:
+        """
+        Handle player input and figure out which buttons were pressed
+
+        Args:
+            prev_speeds (int, int): snake's previous speed vector
+
+        Returns:
+            (int, int): new speed vector
+        """
         new_speeds = prev_speeds
         keys = buttons.get_controls()
+        # get an array of buttons states and check which of them
+        # is being pressed
         if keys[0]:
             new_speeds = (0, -1)
         elif keys[1]:
@@ -118,11 +155,25 @@ else:
         elif keys[3]:
             new_speeds = (1, 0)
         if new_speeds != prev_speeds:
+            # change buttons lighting if the direction has changed
             controller_lights.direction(controller_lights.speed2direction(new_speeds))
         return new_speeds
 
+
 def process_input(prev_speeds):
-    new_speeds = handle_input(prev_speeds)
+    """
+    update speed vector only if the new direction is valid.
+    (not opposite from previous direction)
+    otherwise, return current speed vector
+
+    Args:
+        prev_speeds (int, int): a speed vector
+
+    Returns:
+        (int, int): a speed vector
+    """
+
+    new_speeds = handle_input(prev_speeds) # get speed vector from user control
 
     if (prev_speeds != (-1)*new_speeds[0] and
     prev_speeds != (-1)*new_speeds[1]) or (
@@ -130,7 +181,19 @@ def process_input(prev_speeds):
         return new_speeds
     return prev_speeds
 
+
 def manage_apples(is_apple, apple_coords, snake: Snake):
+    """
+    generates apples and manages their state.
+
+    Args:
+        is_apple (bool): _description_
+        apple_coords (_type_): _description_
+        snake (Snake): _description_
+
+    Returns:
+        _type_: _description_
+    """
     snake_x = snake.snake_x
     snake_y = snake.snake_y
     while not is_apple:
@@ -158,7 +221,11 @@ def manage_apples(is_apple, apple_coords, snake: Snake):
         graphics.draw_pixel(graphics.coords2led_index(*apple_coords), *graphics.GREEN)
     return (is_apple, apple_coords)
 
+
 def color_frame():
+    """
+    colors the game frame
+    """
     for i in range(screen_conf.WIDTH):
         graphics.draw_pixel(graphics.coords2led_index(i+1, 0), *graphics.BLUE)
         graphics.draw_pixel(graphics.coords2led_index(i+1, screen_conf.HEIGHT), *graphics.BLUE)
@@ -168,6 +235,9 @@ def color_frame():
 
 
 def play():
+    """
+    this is the game loop
+    """
     is_apple = False
     apple_coords = None
     color_frame()
@@ -191,6 +261,7 @@ def play():
         sleep(0.03)
     snake = None
 
+# initiate game loop
 if CONTROL_MODE:
     print(CONTROL_MODE)
 sleep(2)

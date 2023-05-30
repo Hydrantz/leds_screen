@@ -55,25 +55,19 @@ def draw_pixel(led, r, g, b, w):
         w (int): White value
     """
     pixels._set_item(led, r, g, b, w)
+    
+def draw_screen_pixel(x, y, r, g, b, w):
+    """colors a given pixel index with given RGBW values.
+    RGB to RGBW conversion can be done with RGB_parse()
 
-# def draw_pixel_old(led, r, g, b, w):
-#     pixels._post_brightness_buffer[led*3:3*(led+1)] = r, g, b
-
-# def write_grid2board(grid: list):
-#     global pixels
-#     width = len(grid)
-#     height = len(grid[0])
-#     for led in range(len(pixels)):
-#         col_index = led // height
-#         row_index = led % height
-#         if col_index % 2 == 1:
-#             row_index = height - row_index - 1
-#         r = grid[col_index][row_index][0]
-#         g = grid[col_index][row_index][1]
-#         b = grid[col_index][row_index][2]
-#         w = grid[col_index][row_index][3]
-#         pixels._set_item(led, *grid[col_index][row_index])
-#     pixels.show()
+    Args:
+        led (int): pixel chain index
+        r (int): Red value
+        g (int): Green value
+        b (int): Blue value
+        w (int): White value
+    """
+    pixels._set_item(coords2led_index(x, y), r, g, b, w)
 
 def clear_screen():
     """turns off every pixel and updates screen"""

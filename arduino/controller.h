@@ -10,14 +10,15 @@
     };
 class Controller {
 
-    enum Buttons : int{
+    enum Direction : int{
         all = 1,
         up,
         down,
         left,
         right,
+        none,
         
-        BUTTON_ERROR
+        DIRECTION_ERROR
     };
 
     enum Effect : int {
@@ -39,9 +40,10 @@ class Controller {
         int effect_last_time;
         int effect_step;
         Effect current_effect;
-        Buttons current_direction;
+        Direction current_direction;
         Color button_color;
-        bool sel_bun_enabled;
+        Color sel_color;
+        bool is_sel;
 
     public:
         Controller(Adafruit_NeoPixel* led_strip, int strip_length, int bun_led_length);
@@ -63,12 +65,18 @@ class Controller {
         void turnoff_two_leds(int i, int j);
         void set_effect_leds(Color color); // sets color of all effect leds
         void set_buns_leds(Color color); // sets color of all buttons leds
+        void clear_buns(); // turns off every button LED
         void set_buns_leds_default(); // sets color of all buttons leds to default color
         void set_all_leds(Color color); // sets color of every single led
-        void set_sel(bool sel_active); // sets color of every single led
         void fire_effect(); // runs a step of current effect
         void update_effect(Effect new_effect);
-        void update_buttons(Buttons direction); // updates buttons lighting
+        void turn_buttons_by_direction(Direction direction); // updates buttons lighting
+        void turn_buttons_manually(String buttons, Color color); // updates buttons lighting
+        void update_color_default(Color color, bool show, bool sel); // updates buttons default color
+        void update_buttons_default(Color color, bool show=true); // updates buttons default color
+        void update_sel_default(Color color, bool show=true); // updates buttons default color
+        void update_sel_state(bool sel, bool show=true); // updates sel state
+        int bun_2_led_index(char bun, bool firs);
 
         // Effects Helper Functions
         // ========================

@@ -18,10 +18,11 @@ Controller::Controller(
     this->effect_step = 0;
     this->lighting_override = false;
     this->current_effect = Effect::effect_blank;
-    this->current_direction = BUTTON_ERROR;
+    this->current_direction = Direction::none;
     this->button_color = {24, 84, 128};
-    this->sel_bun_enabled = false;
-}
+    this->sel_color = this->button_color;
+    this->is_sel = false;
+    }
 
 // Led Strip Control Functions
 // ===========================
@@ -53,6 +54,9 @@ void Controller::set_effect_leds(Color color) {
 void Controller::set_buns_leds(Color color) {
     set_multi_leds(color, 0, bun_led_length);
 }
+void Controller::clear_buns(){
+    this->set_buns_leds({0,0,0});
+} 
 void Controller::set_buns_leds_default() {
     set_buns_leds(this->button_color);
 }
@@ -60,48 +64,58 @@ void Controller::set_all_leds(Color color) {
     set_multi_leds(color, 0, strip_length);
 }
 
-void Controller::set_sel(bool sel_active){
-    if (sel_active == true){
-        this->sel_bun_enabled = true;
+void Controller::turn_buttons_manually(String buttons, Color color){
+    this->is_sel = false;
+    this->current_direction = Direction::DIRECTION_ERROR;
+    for (int i = 0; i < buttons.length(); i++){
+        int a = bun_2_led_index(buttons[i], true);
+        int b = bun_2_led_index(buttons[i], false);
+        this->setPixel(a, color);
+        this->setPixel(b, color);
     }
-    if (sel_active == false){
-        this->sel_bun_enabled = false;
-    }
+    this->showStrip();
 }
 
-void Controller::update_buttons(Buttons direction) {
-    if (direction >= BUTTON_ERROR){
+void Controller::turn_buttons_by_direction(Direction direction) {
+    if (direction >= Direction::DIRECTION_ERROR){
         return;
     }
     if (direction == 0){
         return;
     }
-    
     if (direction == this->current_direction){
         return;
     }
-    set_buns_leds_default();
-    if (!this->sel_bun_enabled){
-        turnoff_two_leds(8,9);
+    if (direction == Direction::none){
+        this->clear_buns();
     }
-    switch (direction) {
-        case up:
-            turnoff_two_leds(2,3);
-            break;
+    else {
+        set_buns_leds_default();
+        switch (direction) {
+            case up:
+                turnoff_two_leds(2,3);
+                break;
 
-        case down:
-            turnoff_two_leds(0,1);
-            break;
+            case down:
+                turnoff_two_leds(0,1);
+                break;
 
-        case left:
-            turnoff_two_leds(6,7);
-            break;
+            case left:
+                turnoff_two_leds(6,7);
+                break;
 
-        case right:
-            turnoff_two_leds(4,5);
-            break;
+            case right:
+                turnoff_two_leds(4,5);
+                break;
+        }
+    }
+    setPixel(8, this->sel_color);
+    setPixel(9, this->sel_color);
+    if (!is_sel){
+        this->turnoff_two_leds(8,9);
     }
     this->showStrip();
+    this->current_direction = direction;
     return;
 }
 
@@ -114,6 +128,39 @@ void Controller::update_effect(Effect new_effect) {
     }
     this->current_effect = new_effect;
     this->effect_step = 0;
+    return;
+}
+
+void Controller::update_color_default(Color color, bool show, bool sel){
+    if (sel){
+        this->sel_color = color;
+    }
+    else{
+        this->button_color = color;
+    }
+    if (show){
+        Direction dir = this->current_direction;
+        this->current_direction = Direction::DIRECTION_ERROR;
+        this->turn_buttons_by_direction(dir);
+    }
+    return;
+}
+
+void Controller::update_sel_default(Color color, bool show=true){
+    this->update_color_default(color, show, true);
+}
+
+void Controller::update_buttons_default(Color color, bool show=true){
+    this->update_color_default(color, show, false);
+}
+
+void Controller::update_sel_state(bool sel, bool show=true){
+    this->is_sel = sel;
+    if (show){
+        Direction dir = this->current_direction;
+        this->current_direction = Direction::DIRECTION_ERROR;
+        this->turn_buttons_by_direction(dir);
+    }
     return;
 }
 
@@ -250,4 +297,24 @@ void Controller::red_cylon() {
 
 void Controller::white_strobe() {
     strobe({255,255,255}, 20);
+}
+
+int Controller::bun_2_led_index(char bun, bool first){
+    switch (bun) {
+        case 'u':
+            return 2 + !first;
+            break;
+        case 'd':
+            return 0 + !first;
+            break;
+        case 'l':
+            return 6 + !first;
+            break;
+        case 'r':
+            return 4 + !first;
+            break;
+        case 's':
+            return 8 + !first;
+            break;
+    }
 }

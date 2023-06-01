@@ -28,21 +28,42 @@ void Communication::get_input(Controller &ctrl, Scoreboard &score) {
 }
 
 void Communication::use_input(Controller &ctrl, Scoreboard &score){
+    char sel;
+    Color color;
     switch (this->command) {
-    case 'a':
-        ctrl.update_buttons(this->argument.toInt());
-        break;
-    case 'e':
-        ctrl.update_effect(this->argument.toInt());
-        break;
-    case 'o':
-        ctrl.set_sel(this->argument.toInt());
-        break;
-    case 's':
-        score.set_segment_text(true, this->argument);
-        break;
-    case 't':
-        score.set_segment_text(false, this->argument);
-        break;
+        case 'a':
+            ctrl.turn_buttons_by_direction(this->argument.toInt());
+            break;
+        case 'b':
+            color.r = this->argument.substring(0,3).toInt();
+            color.g = this->argument.substring(3,6).toInt();
+            color.b = this->argument.substring(6,9).toInt();
+            sel = this->argument.charAt(9);
+            if (sel == '0'){
+                ctrl.update_sel_default(color);
+            }
+            else{
+                ctrl.update_buttons_default(color);
+            }
+            break;
+        case 'm':
+            color.r = this->argument.substring(0,3).toInt();
+            color.g = this->argument.substring(3,6).toInt();
+            color.b = this->argument.substring(6,9).toInt();
+            ctrl.turn_buttons_manually(this->argument.substring(9), color);
+            break;
+        case 'o':
+            int state = this->argument.toInt();
+            ctrl.update_sel_state(state);
+            break;
+        case 'e':
+            ctrl.update_effect(this->argument.toInt());
+            break;
+        case 's':
+            score.set_segment_text(true, this->argument);
+            break;
+        case 't':
+            score.set_segment_text(false, this->argument);
+            break;
     }
 }

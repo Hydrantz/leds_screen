@@ -37,7 +37,7 @@ def yellow():
 def cyc():
     transmit_effect(4)
 
-def direction(value: int):
+def direction(value):
     comm.transmit("a"+str(value))
 
 def white(value: str):

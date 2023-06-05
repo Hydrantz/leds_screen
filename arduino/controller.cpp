@@ -18,10 +18,7 @@ Controller::Controller(
     this->effect_step = 0;
     this->lighting_override = false;
     this->current_effect = Effect::effect_blank;
-    this->current_direction = Direction::none;
     this->button_color = {24, 84, 128};
-    this->sel_color = this->button_color;
-    this->is_sel = false;
     }
 
 // Led Strip Control Functions
@@ -65,8 +62,6 @@ void Controller::set_all_leds(Color color) {
 }
 
 void Controller::turn_buttons_manually(String buttons, Color color){
-    this->is_sel = false;
-    this->current_direction = Direction::DIRECTION_ERROR;
     for (int i = 0; i < buttons.length(); i++){
         int a = bun_2_led_index(buttons[i], true);
         int b = bun_2_led_index(buttons[i], false);
@@ -74,49 +69,6 @@ void Controller::turn_buttons_manually(String buttons, Color color){
         this->setPixel(b, color);
     }
     this->showStrip();
-}
-
-void Controller::turn_buttons_by_direction(Direction direction) {
-    if (direction >= Direction::DIRECTION_ERROR){
-        return;
-    }
-    if (direction == 0){
-        return;
-    }
-    if (direction == this->current_direction){
-        return;
-    }
-    if (direction == Direction::none){
-        this->clear_buns();
-    }
-    else {
-        set_buns_leds_default();
-        switch (direction) {
-            case up:
-                turnoff_two_leds(2,3);
-                break;
-
-            case down:
-                turnoff_two_leds(0,1);
-                break;
-
-            case left:
-                turnoff_two_leds(6,7);
-                break;
-
-            case right:
-                turnoff_two_leds(4,5);
-                break;
-        }
-    }
-    setPixel(8, this->sel_color);
-    setPixel(9, this->sel_color);
-    if (!is_sel){
-        this->turnoff_two_leds(8,9);
-    }
-    this->showStrip();
-    this->current_direction = direction;
-    return;
 }
 
 void Controller::update_effect(Effect new_effect) {
@@ -131,36 +83,8 @@ void Controller::update_effect(Effect new_effect) {
     return;
 }
 
-void Controller::update_color_default(Color color, bool show, bool sel){
-    if (sel){
-        this->sel_color = color;
-    }
-    else{
-        this->button_color = color;
-    }
-    if (show){
-        Direction dir = this->current_direction;
-        this->current_direction = Direction::DIRECTION_ERROR;
-        this->turn_buttons_by_direction(dir);
-    }
-    return;
-}
-
-void Controller::update_sel_default(Color color, bool show=true){
-    this->update_color_default(color, show, true);
-}
-
-void Controller::update_buttons_default(Color color, bool show=true){
-    this->update_color_default(color, show, false);
-}
-
-void Controller::update_sel_state(bool sel, bool show=true){
-    this->is_sel = sel;
-    if (show){
-        Direction dir = this->current_direction;
-        this->current_direction = Direction::DIRECTION_ERROR;
-        this->turn_buttons_by_direction(dir);
-    }
+void Controller::update_color_default(Color color){
+    this->button_color = color;
     return;
 }
 

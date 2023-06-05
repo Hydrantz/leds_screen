@@ -10,17 +10,6 @@
     };
 class Controller {
 
-    enum Direction : int{
-        all = 1,
-        up,
-        down,
-        left,
-        right,
-        none,
-        
-        DIRECTION_ERROR
-    };
-
     enum Effect : int {
         zero,
         effect_blank,
@@ -40,10 +29,7 @@ class Controller {
         int effect_last_time;
         int effect_step;
         Effect current_effect;
-        Direction current_direction;
         Color button_color;
-        Color sel_color;
-        bool is_sel;
 
     public:
         Controller(Adafruit_NeoPixel* led_strip, int strip_length, int bun_led_length);
@@ -70,12 +56,9 @@ class Controller {
         void set_all_leds(Color color); // sets color of every single led
         void fire_effect(); // runs a step of current effect
         void update_effect(Effect new_effect);
-        void turn_buttons_by_direction(Direction direction); // updates buttons lighting
         void turn_buttons_manually(String buttons, Color color); // updates buttons lighting
-        void update_color_default(Color color, bool show, bool sel); // updates buttons default color
+        void update_color_default(Color color); // updates buttons default color
         void update_buttons_default(Color color, bool show=true); // updates buttons default color
-        void update_sel_default(Color color, bool show=true); // updates buttons default color
-        void update_sel_state(bool sel, bool show=true); // updates sel state
         int bun_2_led_index(char bun, bool firs);
 
         // Effects Helper Functions

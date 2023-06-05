@@ -53,8 +53,8 @@ void Communication::use_input(Controller &ctrl, Scoreboard &score){
             ctrl.turn_buttons_manually(this->argument.substring(9), color);
             break;
         case 'o':
-            int state = this->argument.toInt();
-            ctrl.update_sel_state(state);
+            sel = this->argument.toInt();
+            ctrl.update_sel_state(sel);
             break;
         case 'e':
             ctrl.update_effect(this->argument.toInt());

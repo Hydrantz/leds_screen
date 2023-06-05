@@ -301,16 +301,16 @@ void Controller::white_strobe() {
 
 int Controller::bun_2_led_index(char bun, bool first){
     switch (bun) {
-        case 'u':
+        case 'd':
             return 2 + !first;
             break;
-        case 'd':
+        case 'u':
             return 0 + !first;
             break;
-        case 'l':
+        case 'r':
             return 6 + !first;
             break;
-        case 'r':
+        case 'l':
             return 4 + !first;
             break;
         case 's':

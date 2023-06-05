@@ -31,7 +31,7 @@ if not SERIAL_COMMUNICATION:
 else:
     try:
         import serial
-        ser = serial.Serial(port="/dev/ttyACM0", baudrate=9600 , timeout=.1)
+        ser = serial.Serial(port="/dev/ttyACM_ARDUINO_UNO", baudrate=9600 , timeout=.1)
         ser.flush()
         CONNECTED = True
     except ImportError:

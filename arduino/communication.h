@@ -8,7 +8,7 @@
 class Communication {
   private:
     char rx_char;
-    String data;
+    String cumulative_data;
     char command;
     String argument;
 
@@ -20,7 +20,7 @@ class Communication {
     const Communication& operator=(const Communication&) = delete;
 
     void get_input(Controller &ctrl, Scoreboard &score);
-    void use_input(Controller &ctrl, Scoreboard &score);
+    void interpret_input(Controller &ctrl, Scoreboard &score);
 
   };
 

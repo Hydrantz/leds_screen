@@ -4,6 +4,14 @@
 
 Color color_none = {0,0,0};
 
+uint8_t buttons_indexes[5][2]  = {
+    {0,1},
+    {2,3},
+    {4,5},
+    {6,7},
+    {8,9}
+};
+
 // Constructors
 // ===========================
 
@@ -40,54 +48,60 @@ void Controller::set_multi_leds(Color color, int start, int end) {
         setPixel(i, color);
     }
 }
-void Controller::turnoff_two_leds(int i, int j){
-    setPixel(i,color_none);
-    setPixel(j,color_none);
-    return;
+void Controller::set_all_leds(Color color) {
+    set_multi_leds(color, 0, strip_length);
 }
 void Controller::set_effect_leds(Color color) {
     set_multi_leds(color, bun_led_length, strip_length);
 }
 void Controller::set_buns_leds(Color color) {
     set_multi_leds(color, 0, bun_led_length);
+    showStrip();
 }
-void Controller::clear_buns(){
-    this->set_buns_leds({0,0,0});
-} 
-void Controller::set_buns_leds_default() {
-    set_buns_leds(this->button_color);
+void Controller::turn_buttons_default(String buttons) {
+    turn_buttons_manually(buttons, this->button_color);
 }
-void Controller::set_all_leds(Color color) {
-    set_multi_leds(color, 0, strip_length);
-}
-
 void Controller::turn_buttons_manually(String buttons, Color color){
     for (int i = 0; i < buttons.length(); i++){
-        int a = bun_2_led_index(buttons[i], true);
-        int b = bun_2_led_index(buttons[i], false);
+        int bun_id = this->bun_2_id(buttons[i]);
+        int a = buttons_indexes[bun_id][0];
+        int b = buttons_indexes[bun_id][1];
         this->setPixel(a, color);
         this->setPixel(b, color);
     }
     this->showStrip();
 }
-
-void Controller::update_effect(Effect new_effect) {
-    if (new_effect >= Effect::EFFECT_ERROR || new_effect <= Effect::zero){
-        return;
-    }
-    if (new_effect == this->current_effect){
-        return;
-    }
-    this->current_effect = new_effect;
-    this->effect_step = 0;
-    return;
-}
-
-void Controller::update_color_default(Color color){
+void Controller::update_buttons_default(Color color){
     this->button_color = color;
     return;
 }
-
+void Controller::clear_given_buns(String buttons){
+    this->turn_buttons_manually(buttons, {0,0,0});
+    this->showStrip();
+} 
+void Controller::clear_buns(){
+    this->set_buns_leds({0,0,0});
+    this->showStrip();
+} 
+int Controller::bun_2_id(char bun){
+    switch (bun) {
+        case 'u':
+            return 0;
+            break;
+        case 'd':
+            return 1;
+            break;
+        case 'l':
+            return 2;
+            break;
+        case 'r':
+            return 3;
+            break;
+        case 's':
+            return 4;
+            break;
+    }
+}
 void Controller::fire_effect(){
     switch (this->current_effect) {
         case Effect::effect_blank:
@@ -106,6 +120,17 @@ void Controller::fire_effect(){
             this->white_strobe();
             break;
     }
+    return;
+}
+void Controller::update_effect(Effect new_effect) {
+    if (new_effect >= Effect::EFFECT_ERROR || new_effect <= Effect::zero){
+        return;
+    }
+    if (new_effect == this->current_effect){
+        return;
+    }
+    this->current_effect = new_effect;
+    this->effect_step = 0;
     return;
 }
 
@@ -221,24 +246,4 @@ void Controller::red_cylon() {
 
 void Controller::white_strobe() {
     strobe({255,255,255}, 20);
-}
-
-int Controller::bun_2_led_index(char bun, bool first){
-    switch (bun) {
-        case 'd':
-            return 2 + !first;
-            break;
-        case 'u':
-            return 0 + !first;
-            break;
-        case 'r':
-            return 6 + !first;
-            break;
-        case 'l':
-            return 4 + !first;
-            break;
-        case 's':
-            return 8 + !first;
-            break;
-    }
 }

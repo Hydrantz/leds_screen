@@ -10,17 +10,6 @@
     };
 class Controller {
 
-    enum Direction : int{
-        all = 1,
-        up,
-        down,
-        left,
-        right,
-        none,
-        
-        DIRECTION_ERROR
-    };
-
     enum Effect : int {
         zero,
         effect_blank,
@@ -37,13 +26,10 @@ class Controller {
         int strip_length;
         int bun_led_length; // how many leds are in all of the buttons
         bool lighting_override;
-        int effect_last_time;
-        int effect_step;
+        int effect_last_time; // last time an effect has been fired
+        int effect_step; // current step of effect's state machine
         Effect current_effect;
-        Direction current_direction;
         Color button_color;
-        Color sel_color;
-        bool is_sel;
 
     public:
         Controller(Adafruit_NeoPixel* led_strip, int strip_length, int bun_led_length);
@@ -62,23 +48,30 @@ class Controller {
         void set_multi_leds(Color color,
                             int start,
                             int end); // sets color of a pixels range
-        void turnoff_two_leds(int i, int j);
+        void set_all_leds(Color color); // sets color of every single led in strip
         void set_effect_leds(Color color); // sets color of all effect leds
-        void set_buns_leds(Color color); // sets color of all buttons leds
-        void clear_buns(); // turns off every button LED
-        void set_buns_leds_default(); // sets color of all buttons leds to default color
-        void set_all_leds(Color color); // sets color of every single led
-        void fire_effect(); // runs a step of current effect
-        void update_effect(Effect new_effect);
-        void turn_buttons_by_direction(Direction direction); // updates buttons lighting
-        void turn_buttons_manually(String buttons, Color color); // updates buttons lighting
-        void update_color_default(Color color, bool show, bool sel); // updates buttons default color
-        void update_buttons_default(Color color, bool show=true); // updates buttons default color
-        void update_sel_default(Color color, bool show=true); // updates buttons default color
-        void update_sel_state(bool sel, bool show=true); // updates sel state
-        int bun_2_led_index(char bun, bool firs);
+        void set_buns_leds(Color color); // sets color of all buttons as the given color
 
-        // Effects Helper Functions
+        // Buttons Color Utility Functions
+        // ===========================
+
+        void turn_buttons_default(String buttons); // sets color of given buttons as the default color
+        void turn_buttons_manually(String buttons, Color color); // sets color of given buttons as the given color
+        void update_buttons_default(Color color);   // updates buttons default color
+                                                    // NOTICE: this won't take effect until
+                                                    // the next time set_buns_leds_default()
+                                                    // is called
+        void clear_given_buns(String buttons); // turns off selected button LED
+        void clear_buns(); // turns off every button LED
+        int bun_2_id(char bun);
+
+        // Effects Utility Functions
+        // ===========================
+
+        void fire_effect(); // runs a step of current effect
+        void update_effect(Effect new_effect); // changes the current effect which should be fired
+
+        // Effects Helper Functionss
         // ========================
 
         void CylonBounce(   Color color,

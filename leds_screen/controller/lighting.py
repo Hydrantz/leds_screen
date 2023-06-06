@@ -1,5 +1,5 @@
 """
-Controller Module
+Lighting Module
 ----
 - Manages lighting of custom-made controller
 ---

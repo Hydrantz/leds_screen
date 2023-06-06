@@ -1,7 +1,7 @@
 from time import sleep
 import random
 import sys
-from screen import graphics, screen_configuration as screen_conf
+from screen import graphics, screen_configuration as screen_conf, segmented
 from controller import buttons, lighting as controller_lights, communication as comm
 
 # set screen dimensions according to global screen properties
@@ -35,6 +35,8 @@ class Snake():
                                 # since the graphics are not necessarily reset in
                                 # each game frame, this is used to manually delete
                                 # that node from screen
+
+        self.score = 0
 
         # this creates initial snake_nodes_offsets. the snake is initially oriented
         # to the left.
@@ -217,6 +219,8 @@ def manage_apples(is_apple, apple_coords, snake: Snake):
         is_apple = False
         snake.enlarge_snake()
         controller_lights.transmit_effect("yellow")
+        snake.score += 10
+        segmented.transmit_score(snake.score)
     else:
         graphics.draw_pixel(graphics.coords2led_index(*apple_coords), *graphics.GREEN)
     return (is_apple, apple_coords)
@@ -267,9 +271,12 @@ if CONTROL_MODE:
 sleep(2)
 while True:
     comm.reset_connection()
+    segmented.transmit_text(" ")
     play()
     controller_lights.buttons_clear()
     controller_lights.transmit_effect("blank")
+    segmented.transmit_score(0)
+    segmented.transmit_text("GAMEOVER")
     sleep(2)
     graphics.clear_screen()
     

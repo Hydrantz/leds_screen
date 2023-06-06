@@ -63,38 +63,37 @@ void Communication::interpret_input(Controller &ctrl, Scoreboard &score){
 
     // checks which command was received
     switch (this->command) {
-        case 'a':
-            // Controller: update buttons lights by direction
-            ctrl.turn_buttons_by_direction(this->argument.toInt());
-            break;
         case 'b':
-            // Controller: update buttons lights default color
+            // Controller: update buttons' default color.
+            // this won't achieve immediate results, but
+            // will affect the next call of 
             color.r = this->argument.substring(0,3).toInt();
             color.g = this->argument.substring(3,6).toInt();
             color.b = this->argument.substring(6,9).toInt();
-            // this variable represents whether the updated color
-            // should be the arrows keys' or the select key's
-            sel = this->argument.charAt(9);
-            // update the default color accordingly.
-            if (sel == '0'){
-                ctrl.update_sel_default(color);
-            }
-            else{
-                ctrl.update_buttons_default(color);
-            }
+            ctrl.update_buttons_default(color);
             break;
         case 'm':
-            // Controller: update buttons lights manually.
+            // Controller: turn on buttons lights manually.
+            // this will immediately turn on every selected
+            // button with the selected color.
             color.r = this->argument.substring(0,3).toInt();
             color.g = this->argument.substring(3,6).toInt();
             color.b = this->argument.substring(6,9).toInt();
             ctrl.turn_buttons_manually(this->argument.substring(9), color);
             break;
-        case 'o':
-            // Controller: set wether the select button should be lighted
-            // in "light by direction" mode.
-            sel = this->argument.toInt();
-            ctrl.update_sel_state(sel);
+        case 'd':
+            // Controller: turn on buttons lights as default.
+            // this will immediately turn on every selected
+            // button with default color.
+            ctrl.turn_buttons_default(this->argument);
+            break;
+        case 'r':
+            // turns off selected button LED
+            ctrl.clear_given_buns(this->argument);
+            break;
+        case 'c':
+            // turns off every button LED
+            ctrl.clear_buns();
             break;
         case 'e':
             // Controller: update current controller effect

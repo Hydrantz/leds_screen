@@ -4,6 +4,14 @@
 
 Color color_none = {0,0,0};
 
+uint8_t buttons_indexes[5][2]  = {
+    {0,1},
+    {2,3},
+    {4,5},
+    {6,7},
+    {8,9}
+};
+
 // Constructors
 // ===========================
 
@@ -18,10 +26,7 @@ Controller::Controller(
     this->effect_step = 0;
     this->lighting_override = false;
     this->current_effect = Effect::effect_blank;
-    this->current_direction = Direction::none;
     this->button_color = {24, 84, 128};
-    this->sel_color = this->button_color;
-    this->is_sel = false;
     }
 
 // Led Strip Control Functions
@@ -43,127 +48,60 @@ void Controller::set_multi_leds(Color color, int start, int end) {
         setPixel(i, color);
     }
 }
-void Controller::turnoff_two_leds(int i, int j){
-    setPixel(i,color_none);
-    setPixel(j,color_none);
-    return;
+void Controller::set_all_leds(Color color) {
+    set_multi_leds(color, 0, strip_length);
 }
 void Controller::set_effect_leds(Color color) {
     set_multi_leds(color, bun_led_length, strip_length);
 }
 void Controller::set_buns_leds(Color color) {
     set_multi_leds(color, 0, bun_led_length);
+    showStrip();
 }
-void Controller::clear_buns(){
-    this->set_buns_leds({0,0,0});
-} 
-void Controller::set_buns_leds_default() {
-    set_buns_leds(this->button_color);
+void Controller::turn_buttons_default(String buttons) {
+    turn_buttons_manually(buttons, this->button_color);
 }
-void Controller::set_all_leds(Color color) {
-    set_multi_leds(color, 0, strip_length);
-}
-
 void Controller::turn_buttons_manually(String buttons, Color color){
-    this->is_sel = false;
-    this->current_direction = Direction::DIRECTION_ERROR;
     for (int i = 0; i < buttons.length(); i++){
-        int a = bun_2_led_index(buttons[i], true);
-        int b = bun_2_led_index(buttons[i], false);
+        int bun_id = this->bun_2_id(buttons[i]);
+        int a = buttons_indexes[bun_id][0];
+        int b = buttons_indexes[bun_id][1];
         this->setPixel(a, color);
         this->setPixel(b, color);
     }
     this->showStrip();
 }
-
-void Controller::turn_buttons_by_direction(Direction direction) {
-    if (direction >= Direction::DIRECTION_ERROR){
-        return;
-    }
-    if (direction == 0){
-        return;
-    }
-    if (direction == this->current_direction){
-        return;
-    }
-    if (direction == Direction::none){
-        this->clear_buns();
-    }
-    else {
-        set_buns_leds_default();
-        switch (direction) {
-            case up:
-                turnoff_two_leds(2,3);
-                break;
-
-            case down:
-                turnoff_two_leds(0,1);
-                break;
-
-            case left:
-                turnoff_two_leds(6,7);
-                break;
-
-            case right:
-                turnoff_two_leds(4,5);
-                break;
-        }
-    }
-    setPixel(8, this->sel_color);
-    setPixel(9, this->sel_color);
-    if (!is_sel){
-        this->turnoff_two_leds(8,9);
-    }
+void Controller::update_buttons_default(Color color){
+    this->button_color = color;
+    return;
+}
+void Controller::clear_given_buns(String buttons){
+    this->turn_buttons_manually(buttons, {0,0,0});
     this->showStrip();
-    this->current_direction = direction;
-    return;
-}
-
-void Controller::update_effect(Effect new_effect) {
-    if (new_effect >= Effect::EFFECT_ERROR || new_effect <= Effect::zero){
-        return;
+} 
+void Controller::clear_buns(){
+    this->set_buns_leds({0,0,0});
+    this->showStrip();
+} 
+int Controller::bun_2_id(char bun){
+    switch (bun) {
+        case 'u':
+            return 0;
+            break;
+        case 'd':
+            return 1;
+            break;
+        case 'l':
+            return 2;
+            break;
+        case 'r':
+            return 3;
+            break;
+        case 's':
+            return 4;
+            break;
     }
-    if (new_effect == this->current_effect){
-        return;
-    }
-    this->current_effect = new_effect;
-    this->effect_step = 0;
-    return;
 }
-
-void Controller::update_color_default(Color color, bool show, bool sel){
-    if (sel){
-        this->sel_color = color;
-    }
-    else{
-        this->button_color = color;
-    }
-    if (show){
-        Direction dir = this->current_direction;
-        this->current_direction = Direction::DIRECTION_ERROR;
-        this->turn_buttons_by_direction(dir);
-    }
-    return;
-}
-
-void Controller::update_sel_default(Color color, bool show=true){
-    this->update_color_default(color, show, true);
-}
-
-void Controller::update_buttons_default(Color color, bool show=true){
-    this->update_color_default(color, show, false);
-}
-
-void Controller::update_sel_state(bool sel, bool show=true){
-    this->is_sel = sel;
-    if (show){
-        Direction dir = this->current_direction;
-        this->current_direction = Direction::DIRECTION_ERROR;
-        this->turn_buttons_by_direction(dir);
-    }
-    return;
-}
-
 void Controller::fire_effect(){
     switch (this->current_effect) {
         case Effect::effect_blank:
@@ -182,6 +120,17 @@ void Controller::fire_effect(){
             this->white_strobe();
             break;
     }
+    return;
+}
+void Controller::update_effect(Effect new_effect) {
+    if (new_effect >= Effect::EFFECT_ERROR || new_effect <= Effect::zero){
+        return;
+    }
+    if (new_effect == this->current_effect){
+        return;
+    }
+    this->current_effect = new_effect;
+    this->effect_step = 0;
     return;
 }
 
@@ -297,24 +246,4 @@ void Controller::red_cylon() {
 
 void Controller::white_strobe() {
     strobe({255,255,255}, 20);
-}
-
-int Controller::bun_2_led_index(char bun, bool first){
-    switch (bun) {
-        case 'd':
-            return 2 + !first;
-            break;
-        case 'u':
-            return 0 + !first;
-            break;
-        case 'r':
-            return 6 + !first;
-            break;
-        case 'l':
-            return 4 + !first;
-            break;
-        case 's':
-            return 8 + !first;
-            break;
-    }
 }

@@ -7,47 +7,30 @@ Controller Module
 
 from controller import communication as comm
 
-ALL = 1
-UP = 2
-DOWN = 3
-LEFT = 4
-RIGHT = 5
+Effects = {
+   "blank" : 1,
+   "blue" : 2,
+   "yellow" : 3,
+   "cyc" : 4,
+   "strobe" : 5   
+}
 
-def transmit_effect(effect_id: int):
-    comm.transmit("e"+str(effect_id))
+def transmit_effect(effect_name: str):
+    """transmits an effect by given ID"""
+    comm.transmit("e"+str(Effects[effect_name]))
 
-def speed2direction(speed: tuple):
-    if speed[0] == 0:
-        if speed[1] == 1:
-            return DOWN
-        return UP
-    if speed[0] == 1:
-        return RIGHT
-    return LEFT
+def direction(speed: tuple):
+    buttons_clear()
+    buttons = speed2direction(speed)
+    turn_buttons_color_default(buttons)
 
-def blue():
-    transmit_effect(2)
-
-def blank():
-    transmit_effect(1)
-
-def yellow():
-    transmit_effect(3)
-
-def cyc():
-    transmit_effect(4)
-
-def white(value: str):
-    transmit_effect("w"+value)
-
-def flash():
-    transmit_effect(5)
-
-def direction(value):
-    comm.transmit("a"+str(value))
-
-def buttons_clear():
-    comm.transmit("a6")
+def buttons_clear(buttons=""):
+    """clears given buttons. if none are being given, clear all"""
+    if buttons:
+        comm.transmit("r"+buttons)
+    else:
+        comm.transmit("c")
+    return
 
 def color_int_to_string(value: int):
     s = ""
@@ -57,18 +40,27 @@ def color_int_to_string(value: int):
         s += "0"
     return s + str(value)
 
-def buttons_default_color(r: int, g: int, b: int, sel: bool):
+def set_buttons_default_color(r: int, g: int, b: int):
     r = color_int_to_string(r)
     g = color_int_to_string(g)
     b = color_int_to_string(b)
-    comm.transmit("b"+r+g+b+str(int(sel)))
+    comm.transmit("b"+r+g+b)
 
-def set_buttons_color_manually(r: int, g: int, b: int, buns: str):
+def turn_buttons_color_manually(r: int, g: int, b: int, buns: str):
     r = color_int_to_string(r)
     g = color_int_to_string(g)
     b = color_int_to_string(b)
     message = "m"+r+g+b+buns
     comm.transmit(message)
 
-def set_sel_state(sel: bool):
-    comm.transmit("o"+str(int(sel)))
+def turn_buttons_color_default(buns: str):
+    comm.transmit("d"+buns)
+
+def speed2direction(speed: tuple):
+    if speed[0] == 0:
+        if speed[1] == 1:
+            return "dlr"
+        return "ulr"
+    if speed[0] == 1:
+        return "rud"
+    return "lud"

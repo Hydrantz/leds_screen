@@ -10,7 +10,9 @@
     };
 class Controller {
 
-    enum Effect : int {
+    public:
+
+        enum Effect : int {
         zero,
         effect_blank,
         effect_blue,
@@ -19,19 +21,8 @@ class Controller {
         effect_strobe,
         
         EFFECT_ERROR
-    };
-
-    private:
-        Adafruit_NeoPixel* led_strip;
-        int strip_length;
-        int bun_led_length; // how many leds are in all of the buttons
-        bool lighting_override;
-        int effect_last_time; // last time an effect has been fired
-        int effect_step; // current step of effect's state machine
-        Effect current_effect;
-        Color button_color;
-
-    public:
+        };
+    
         Controller(Adafruit_NeoPixel* led_strip, int strip_length, int bun_led_length);
         Controller(Controller&) = delete;
         Controller(const Controller&) = delete;
@@ -90,6 +81,16 @@ class Controller {
         void blue();
         void red_cylon();
         void white_strobe();
+
+        private:
+        Adafruit_NeoPixel* led_strip;
+        int strip_length;
+        int bun_led_length; // how many leds are in all of the buttons
+        bool lighting_override;
+        int effect_last_time; // last time an effect has been fired
+        int effect_step; // current step of effect's state machine
+        Effect current_effect;
+        Color button_color;
 
     };
 

@@ -270,7 +270,7 @@ if CONTROL_MODE:
     print(CONTROL_MODE)
 sleep(2)
 while True:
-    comm.reset_connection()
+    comm.reset_all_connections()
     segmented.transmit_text(" ")
     play()
     controller_lights.buttons_clear()

@@ -17,7 +17,7 @@ Effects = {
 
 def transmit_effect(effect_name: str):
     """transmits an effect by given ID"""
-    comm.transmit("e"+str(Effects[effect_name]))
+    comm.transmit("e"+str(Effects[effect_name]), comm.ser_controller)
 
 def direction(speed: tuple):
     buttons_clear()
@@ -27,9 +27,9 @@ def direction(speed: tuple):
 def buttons_clear(buttons=""):
     """clears given buttons. if none are being given, clear all"""
     if buttons:
-        comm.transmit("r"+buttons)
+        comm.transmit("r"+buttons, comm.ser_controller)
     else:
-        comm.transmit("c")
+        comm.transmit("c", comm.ser_controller)
     return
 
 def color_int_to_string(value: int):
@@ -44,17 +44,17 @@ def set_buttons_default_color(r: int, g: int, b: int):
     r = color_int_to_string(r)
     g = color_int_to_string(g)
     b = color_int_to_string(b)
-    comm.transmit("b"+r+g+b)
+    comm.transmit("b"+r+g+b, comm.ser_controller)
 
 def turn_buttons_color_manually(r: int, g: int, b: int, buns: str):
     r = color_int_to_string(r)
     g = color_int_to_string(g)
     b = color_int_to_string(b)
     message = "m"+r+g+b+buns
-    comm.transmit(message)
+    comm.transmit(message, comm.ser_controller)
 
 def turn_buttons_color_default(buns: str):
-    comm.transmit("d"+buns)
+    comm.transmit("d"+buns, comm.ser_controller)
 
 def speed2direction(speed: tuple):
     if speed[0] == 0:

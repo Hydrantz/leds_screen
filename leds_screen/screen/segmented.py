@@ -9,7 +9,7 @@ from controller import communication as comm
 
 def transmit_text(text: str):
     """transmits text to segmented display"""
-    comm.transmit("t"+text)
+    comm.transmit("t"+text, comm.ser_score)
 
 def transmit_score(score: int):
     """transmits score to segmented display"""
@@ -21,4 +21,4 @@ def transmit_score(score: int):
         length = len(data)
         if length < 8:
             data = " "*(8-length) + data
-    comm.transmit("s"+data)
+    comm.transmit("s"+data, comm.ser_score)

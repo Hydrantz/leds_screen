@@ -1,5 +1,5 @@
 """
-Controller Module
+Buttons Module
 ----
 - Manages buttons of custom-made controller
 ---

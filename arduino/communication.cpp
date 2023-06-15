@@ -10,9 +10,9 @@
 Communication::Communication(){
     this->rx_char = ' ';    // a char containing last received character
     this->cumulative_data = ""; // a String containing the accumulative data (not necessarily completed) 
-    this->command = ""; // a String containing the command part of the last COMPLETED 
+    this->command = ' '; // a String containing the command part of the last COMPLETED 
                         // message received
-    this->argument = "";    // a String containing the argument part of the last COMPLETED 
+    this->argument = ' ';    // a String containing the argument part of the last COMPLETED 
                             // message received
 }
 
@@ -97,7 +97,7 @@ void Communication::interpret_input(Controller &ctrl, Scoreboard &score){
             break;
         case 'e':
             // Controller: update current controller effect
-            ctrl.update_effect(this->argument.toInt());
+            ctrl.update_effect((Controller::Effect)this->argument.toInt());
             break;
         case 's':
             // Scoreboard: update showing score.

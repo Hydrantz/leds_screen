@@ -1,7 +1,7 @@
 from time import sleep
 import random
 import sys
-from screen import graphics, screen_configuration as screen_conf
+from screen import graphics, screen_configuration as screen_conf, segmented
 from controller import buttons, lighting as controller_lights, communication as comm
 
 # set screen dimensions according to global screen properties
@@ -35,6 +35,8 @@ class Snake():
                                 # since the graphics are not necessarily reset in
                                 # each game frame, this is used to manually delete
                                 # that node from screen
+
+        self.score = 0
 
         # this creates initial snake_nodes_offsets. the snake is initially oriented
         # to the left.
@@ -156,7 +158,7 @@ else:
             new_speeds = (1, 0)
         if new_speeds != prev_speeds:
             # change buttons lighting if the direction has changed
-            controller_lights.direction(controller_lights.speed2direction(new_speeds))
+            controller_lights.direction(new_speeds)
         return new_speeds
 
 
@@ -216,7 +218,9 @@ def manage_apples(is_apple, apple_coords, snake: Snake):
     if apple_coords == (snake_x, snake_y):
         is_apple = False
         snake.enlarge_snake()
-        controller_lights.yellow()
+        controller_lights.transmit_effect("yellow")
+        snake.score += 10
+        segmented.transmit_score(snake.score)
     else:
         graphics.draw_pixel(graphics.coords2led_index(*apple_coords), *graphics.GREEN)
     return (is_apple, apple_coords)
@@ -244,12 +248,12 @@ def play():
     snake = Snake()
     run = True
     initial_speed = (-1, 0)
-    controller_lights.direction(controller_lights.LEFT)
+    controller_lights.turn_buttons_color_default("l")
     if CONTROL_MODE == "keyboard":
         keyboard.wait("left")
     else:
         buttons.wait_for("left")
-    controller_lights.blue()
+    controller_lights.transmit_effect("blue")
     process_input(initial_speed)
     while run:
         color_frame()
@@ -266,9 +270,13 @@ if CONTROL_MODE:
     print(CONTROL_MODE)
 sleep(2)
 while True:
-    comm.reset_connection()
+    comm.reset_all_connections()
+    segmented.transmit_text(" ")
     play()
-    controller_lights.blank()
+    controller_lights.buttons_clear()
+    controller_lights.transmit_effect("blank")
+    segmented.transmit_score(0)
+    segmented.transmit_text("GAMEOVER")
     sleep(2)
     graphics.clear_screen()
     

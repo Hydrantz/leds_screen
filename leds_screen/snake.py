@@ -80,16 +80,26 @@ class Snake():
         self.snake_x += self.snake_speeds[0]
         self.snake_y += self.snake_speeds[1]
 
+
         # check collision with wall
         if self.snake_x >= WIDTH or self.snake_x <= 1:
             return False
         if self.snake_y >= HEIGHT-1 or self.snake_y <= 0:
             return False
 
-        # the following lines adds the relevant offset to the top of snake_nodes_offsets.
-        # also removes the bottom element since that pixel has moved.
+        # the following lines add the relevant offset to the top of snake_nodes_offsets.
+        # also remove the bottom element since that pixel has moved.
         self.snake_nodes_offsets.insert(0,(-self.snake_speeds[0], -self.snake_speeds[1]))
         self.snake_nodes_offsets = self.snake_nodes_offsets[:-1]
+
+        # check self collision
+        node_x = self.snake_x
+        node_y = self.snake_y
+        for offset in self.snake_nodes_offsets:
+            node_x += offset[0]
+            node_y += offset[1]
+            if self.snake_x == node_x and self.snake_y == node_y:
+                return False
 
         self.draw_snake() # draw the moved snake to screen
         return True
@@ -148,7 +158,9 @@ else:
         keys = buttons.get_controls()
         # get an array of buttons states and check which of them
         # is being pressed
-        if keys[0]:
+        if keys[4]:
+            return new_speeds
+        elif keys[0]:
             new_speeds = (0, -1)
         elif keys[1]:
             new_speeds = (0, 1)
@@ -177,8 +189,8 @@ def process_input(prev_speeds):
 
     new_speeds = handle_input(prev_speeds) # get speed vector from user control
 
-    if (prev_speeds != (-1)*new_speeds[0] and
-    prev_speeds != (-1)*new_speeds[1]) or (
+    if (prev_speeds[0] != (-1)*new_speeds[0] and
+    prev_speeds[1] != (-1)*new_speeds[1]) or (
     prev_speeds == (0, 0)):
         return new_speeds
     return prev_speeds
@@ -253,7 +265,6 @@ def play():
         keyboard.wait("left")
     else:
         buttons.wait_for("left")
-    controller_lights.transmit_effect("blue")
     process_input(initial_speed)
     while run:
         color_frame()

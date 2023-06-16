@@ -3,6 +3,8 @@ import random
 import sys
 from screen import graphics, screen_configuration as screen_conf, segmented
 from controller import buttons, lighting as controller_lights, communication as comm
+import pygame.mixer as mx
+
 
 # set screen dimensions according to global screen properties
 HEIGHT = screen_conf.HEIGHT
@@ -230,6 +232,7 @@ def manage_apples(is_apple, apple_coords, snake: Snake):
     if apple_coords == (snake_x, snake_y):
         is_apple = False
         snake.enlarge_snake()
+        eat.play()
         controller_lights.transmit_effect("yellow")
         snake.score += 10
         segmented.transmit_score(snake.score)
@@ -277,16 +280,20 @@ def play():
     snake = None
 
 # initiate game loop
+mx.init(24000, -16, 2, 512)
 if CONTROL_MODE:
     print(CONTROL_MODE)
 sleep(2)
 while True:
     comm.reset_all_connections()
+    segmented.transmit_score(0)
     segmented.transmit_text(" ")
+    eat = mx.Sound("audio/eat.wav")
+    gameover = mx.Sound("audio/gameover.wav")
     play()
+    gameover.play()
     controller_lights.buttons_clear()
     controller_lights.transmit_effect("blank")
-    segmented.transmit_score(0)
     segmented.transmit_text("GAMEOVER")
     sleep(2)
     graphics.clear_screen()

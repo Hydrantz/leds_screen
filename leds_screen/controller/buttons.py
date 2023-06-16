@@ -7,6 +7,7 @@ Buttons Module
 
 import board
 import digitalio
+import time
 
 
 UP = digitalio.DigitalInOut(board.D1)
@@ -34,6 +35,7 @@ def wait_for(key):
         status = get_key_status(key)
         if status:
             return
+        time.sleep(0.01)
 
 def get_key_status(key: str):
     if key == 'up':

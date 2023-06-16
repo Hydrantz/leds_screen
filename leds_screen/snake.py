@@ -3,6 +3,8 @@ import random
 import sys
 from screen import graphics, screen_configuration as screen_conf, segmented
 from controller import buttons, lighting as controller_lights, communication as comm
+import pygame.mixer as mx
+
 
 # set screen dimensions according to global screen properties
 HEIGHT = screen_conf.HEIGHT
@@ -80,16 +82,26 @@ class Snake():
         self.snake_x += self.snake_speeds[0]
         self.snake_y += self.snake_speeds[1]
 
+
         # check collision with wall
         if self.snake_x >= WIDTH or self.snake_x <= 1:
             return False
         if self.snake_y >= HEIGHT-1 or self.snake_y <= 0:
             return False
 
-        # the following lines adds the relevant offset to the top of snake_nodes_offsets.
-        # also removes the bottom element since that pixel has moved.
+        # the following lines add the relevant offset to the top of snake_nodes_offsets.
+        # also remove the bottom element since that pixel has moved.
         self.snake_nodes_offsets.insert(0,(-self.snake_speeds[0], -self.snake_speeds[1]))
         self.snake_nodes_offsets = self.snake_nodes_offsets[:-1]
+
+        # check self collision
+        node_x = self.snake_x
+        node_y = self.snake_y
+        for offset in self.snake_nodes_offsets:
+            node_x += offset[0]
+            node_y += offset[1]
+            if self.snake_x == node_x and self.snake_y == node_y:
+                return False
 
         self.draw_snake() # draw the moved snake to screen
         return True
@@ -148,7 +160,9 @@ else:
         keys = buttons.get_controls()
         # get an array of buttons states and check which of them
         # is being pressed
-        if keys[0]:
+        if keys[4]:
+            return new_speeds
+        elif keys[0]:
             new_speeds = (0, -1)
         elif keys[1]:
             new_speeds = (0, 1)
@@ -177,8 +191,8 @@ def process_input(prev_speeds):
 
     new_speeds = handle_input(prev_speeds) # get speed vector from user control
 
-    if (prev_speeds != (-1)*new_speeds[0] and
-    prev_speeds != (-1)*new_speeds[1]) or (
+    if (prev_speeds[0] != (-1)*new_speeds[0] and
+    prev_speeds[1] != (-1)*new_speeds[1]) or (
     prev_speeds == (0, 0)):
         return new_speeds
     return prev_speeds
@@ -218,6 +232,7 @@ def manage_apples(is_apple, apple_coords, snake: Snake):
     if apple_coords == (snake_x, snake_y):
         is_apple = False
         snake.enlarge_snake()
+        eat.play()
         controller_lights.transmit_effect("yellow")
         snake.score += 10
         segmented.transmit_score(snake.score)
@@ -253,7 +268,6 @@ def play():
         keyboard.wait("left")
     else:
         buttons.wait_for("left")
-    controller_lights.transmit_effect("blue")
     process_input(initial_speed)
     while run:
         color_frame()
@@ -266,16 +280,20 @@ def play():
     snake = None
 
 # initiate game loop
+mx.init(24000, -16, 2, 512)
 if CONTROL_MODE:
     print(CONTROL_MODE)
 sleep(2)
 while True:
     comm.reset_all_connections()
+    segmented.transmit_score(0)
     segmented.transmit_text(" ")
+    eat = mx.Sound("audio/eat.wav")
+    gameover = mx.Sound("audio/gameover.wav")
     play()
+    gameover.play()
     controller_lights.buttons_clear()
     controller_lights.transmit_effect("blank")
-    segmented.transmit_score(0)
     segmented.transmit_text("GAMEOVER")
     sleep(2)
     graphics.clear_screen()

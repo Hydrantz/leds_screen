@@ -11,7 +11,7 @@ import neopixel
 from screen import screen_configuration as screen_conf
 
 # creates screen object using neopixel library
-pixels = neopixel.NeoPixel(screen_conf.GPIO, screen_conf.LED_NUM, pixel_order=screen_conf.ORDER, auto_write=False)
+pixels = neopixel.NeoPixel(screen_conf.GPIO, screen_conf.LED_NUM, pixel_order=screen_conf.ORDER, auto_write=False, brightness=0.5)
 
 # pre-defined colors using RGB values
 WHITE = pixels._parse_color((25,25,25))

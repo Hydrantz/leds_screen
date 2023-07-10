@@ -5,7 +5,10 @@ Lighting Module
 ---
 """
 
-from controller import communication as comm
+import sys
+sys.path.append('..')
+
+from leds_screen.controller import communication as comm
 
 Effects = {
    "blank" : 1,

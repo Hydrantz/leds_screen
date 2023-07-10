@@ -27,6 +27,7 @@ Controller::Controller(
     this->lighting_override = false;
     this->current_effect = Effect::effect_blank;
     this->button_color = {24, 84, 128};
+    this->effect_color = {0, 255, 0};
     }
 
 // Led Strip Control Functions
@@ -119,6 +120,12 @@ void Controller::fire_effect(){
         case Effect::effect_strobe:
             this->white_strobe();
             break;
+        case Effect::effect_default:
+            this->mono_color_default();
+            break;
+        case Effect::effect_flash:
+            this->flash_default();
+            break;
     }
     return;
 }
@@ -185,7 +192,7 @@ void Controller::mono_color_cycle(Color color) {
     effect_step += 1;
 }
 
-void Controller::strobe(Color color, int FlashDelay){
+void Controller::single_flash(Color color, int FlashDelay){
     int cur_time = millis();
     // Manage Delay
     if (cur_time - effect_last_time < FlashDelay){
@@ -193,17 +200,25 @@ void Controller::strobe(Color color, int FlashDelay){
     }
     effect_last_time = cur_time;
     if (effect_step >= 2){
-        effect_step = 0;
+        update_effect(Effect::effect_blank);
+        return;
     }
     if (effect_step == 0) {
         set_effect_leds(color);
         effect_step = 1;
     }
-    else {
+    else if (effect_step == 1){
         set_effect_leds(color_none);
-        effect_step = 0;
+        effect_step = 2;
     }
     showEffect();
+}
+
+void Controller::strobe(Color color, int FlashDelay){
+    if (effect_step >= 2){
+        effect_step = 0;
+    }
+    single_flash(color, FlashDelay);
 }
 
 void Controller::mono_color(Color color) {
@@ -246,4 +261,12 @@ void Controller::red_cylon() {
 
 void Controller::white_strobe() {
     strobe({255,255,255}, 20);
+}
+
+void Controller::mono_color_default(){
+    mono_color(this->effect_color);
+}
+
+void Controller::flash_default(){
+    single_flash(this->effect_color, 100);
 }

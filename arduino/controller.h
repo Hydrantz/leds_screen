@@ -19,6 +19,8 @@ class Controller {
         effect_yellow,
         effect_cylon,
         effect_strobe,
+        effect_default,
+        effect_flash,
         
         EFFECT_ERROR
         };
@@ -71,6 +73,7 @@ class Controller {
                             int ReturnDelay );
         void mono_color_cycle(Color color);
         void strobe(Color color, int FlashDelay);
+        void single_flash(Color color, int FlashDelay);
         void mono_color(Color color);
 
         // Effects
@@ -81,6 +84,8 @@ class Controller {
         void blue();
         void red_cylon();
         void white_strobe();
+        void mono_color_default();
+        void flash_default();
 
         private:
         Adafruit_NeoPixel* led_strip;
@@ -91,6 +96,7 @@ class Controller {
         int effect_step; // current step of effect's state machine
         Effect current_effect;
         Color button_color;
+        Color effect_color;
 
     };
 

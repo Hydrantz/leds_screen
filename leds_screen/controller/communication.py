@@ -15,7 +15,7 @@ SERIAL_COMMUNICATION = True
 try:
     import serial
     ser_controller = serial.Serial(port="/dev/ttyUSB_CONTROLLER", baudrate=9600 , timeout=.1)
-    ser_score = serial.Serial(port="/dev/ttyACM_ARDUINO_UNO", baudrate=9600 , timeout=.1)
+    ser_score = serial.Serial(port="/dev/ttyUSB_SCOREBOARD", baudrate=9600 , timeout=.1)
     CONNECTED = True
 except ImportError:
     CONNECTED = False

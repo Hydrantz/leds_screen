@@ -15,7 +15,9 @@ Effects = {
    "blue" : 2,
    "yellow" : 3,
    "cyc" : 4,
-   "strobe" : 5   
+   "strobe" : 5,
+   "solid" : 6,
+   "flash" : 7
 }
 
 def transmit_effect(effect_name: str):

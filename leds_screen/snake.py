@@ -233,7 +233,7 @@ def manage_apples(is_apple, apple_coords, snake: Snake):
         is_apple = False
         snake.enlarge_snake()
         eat.play()
-        controller_lights.transmit_effect("yellow")
+        controller_lights.transmit_effect("flash")
         snake.score += 10
         segmented.transmit_score(snake.score)
     else:

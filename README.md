@@ -14,8 +14,17 @@ Watch Controller Effects Demo ↓
 
 ## Photos
 
+### Screen wiring
+<img src="imgs/back_wiring.jpg">
+
 ### A custom made 24 bit shift register module, designed to manage data transmission to scoreboard. Shifting the signals allows using only 3 data lines (clock, latch, serial) instead of 128 data lines (8 digits X 16 segments per digits)
 <img src="imgs/shift_register_pcb.jpg">
+
+### Controller enclosure without buttons
+<img src="imgs/controller_top_view.jpg">
+
+### Controller internal wiring
+<img src="imgs/controller_wiring.jpg">
 
 ### A custom made PCB designed to manage data signals transfer between Raspberry Pi and Controller Hardware
 <img src="imgs/controller_pcb.jpg">

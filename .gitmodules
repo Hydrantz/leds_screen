@@ -1,0 +1,3 @@
+[submodule "PCB/library/hydrant"]
+	path = PCB/library/hydrant
+	url = github:Hydrantz/KiCad-Library.git

@@ -1,5 +1,5 @@
-from time import sleep
-import random
+from time import sleep, time
+import random, math
 import sys
 from screen import graphics, screen_configuration as screen_conf, segmented
 from controller import buttons, lighting as controller_lights, communication as comm
@@ -39,6 +39,8 @@ class Snake():
                                 # that node from screen
 
         self.score = 0
+        self.state = None
+        self.multiplier = 1
 
         # this creates initial snake_nodes_offsets. the snake is initially oriented
         # to the left.
@@ -218,6 +220,12 @@ def manage_apples(is_apple, apple_coords, snake: Snake):
 
         if apple_x == snake_x or apple_y == snake_y:
             continue
+        
+        if not snake.state:
+            prob = random.randrange(10)
+            if prob == 0:
+                snake.state = time()
+        
         snake_offset = snake.snake_nodes_offsets
         for chain in snake_offset:
             snake_x += chain[0]
@@ -226,18 +234,29 @@ def manage_apples(is_apple, apple_coords, snake: Snake):
                 continue
         apple_coords = apple_x, apple_y
         is_apple = True
-        graphics.draw_pixel(graphics.coords2led_index(*apple_coords), *graphics.GREEN)
         return (is_apple, apple_coords)
+
+    apple_color = graphics.GREEN
+    if snake.state:
+        now = time()
+        if not (now-snake.state > 12 and now-math.floor(now)>0.5):
+            apple_color = graphics.YELLOW
 
     if apple_coords == (snake_x, snake_y):
         is_apple = False
         snake.enlarge_snake()
-        eat.play()
+        if snake.state:
+            if snake.multiplier < 256:
+                snake.multiplier *= 2
+            mx.Sound("audio/eat_mult/"+str(snake.multiplier)+".wav").play()
+            segmented.transmit_text("X"+str(snake.multiplier))
+        else:
+            eat.play()
         controller_lights.transmit_effect("flash")
-        snake.score += 10
+        snake.score += 10*snake.multiplier
         segmented.transmit_score(snake.score)
     else:
-        graphics.draw_pixel(graphics.coords2led_index(*apple_coords), *graphics.GREEN)
+        graphics.draw_pixel(graphics.coords2led_index(*apple_coords), *apple_color)
     return (is_apple, apple_coords)
 
 
@@ -271,12 +290,18 @@ def play():
     process_input(initial_speed)
     while run:
         color_frame()
+        if snake.state:
+            now = time()
+            if now - snake.state > 15:
+                snake.state = None
+                segmented.transmit_text(" ")
+                snake.multiplier = 1
         speeds = process_input(snake.snake_speeds)
         snake.snake_speeds = speeds
         is_apple, apple_coords = manage_apples(is_apple, apple_coords, snake)
 
         run = snake.move_snake()
-        sleep(0.03)
+        # sleep(0.03)
     snake = None
 
 # initiate game loop

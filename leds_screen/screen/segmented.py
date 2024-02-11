@@ -5,7 +5,10 @@ Segments Module
 ---
 """
 
-from controller import communication as comm
+import sys
+sys.path.append('..')
+
+from leds_screen.controller import communication as comm
 
 def transmit_text(text: str):
     """transmits text to segmented display"""
